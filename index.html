@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<!-- Zenith ICT Care – প্রশ্নব্যাংক: একটি ফাইলেই HTML + CSS + JavaScript -->
+<!-- (এখানে প্রশ্ন, অধ্যায়, সেট ও বোর্ড-সাল পরিচালনা এবং A4 প্রশ্নপত্র প্রিন্টের ব্যবস্থা আছে) -->
+<html lang="bn">
+
+<!-- হেড অংশ: মেটা তথ্য, ফন্ট ও CSS -->
+<head>
+    <!-- বাংলা লেখার জন্য UTF-8 এনকোডিং -->
+    <meta charset="utf-8">
+    <!-- মোবাইলে সঠিক মাপ ও সেফ-এরিয়া সাপোর্ট -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <!-- ব্রাউজার ট্যাবের শিরোনাম -->
+    <title>Zenith ICT Care – প্রশ্নব্যাংক</title>
+    <!-- Google Fonts থেকে Noto Sans Bengali ফন্ট -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+    <!-- ---------- CSS স্টাইল শুরু ---------- -->
+    <style>
+        /* থিমের রঙের ভ্যারিয়েবল (লাইট থিম) ও সেফ-এরিয়া প্যাডিং */
+        :root {
+            --bg: #f4f6fa;
+            --fg: #1c2330;
+            --card: #fff;
+            --mu: #667085;
+            --bd: #d9dee7;
+            --ac: #1f6feb;
+            --ac2: #e8f0fe;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        /* সিস্টেম ডার্ক মোড হলে ডার্ক থিমের রঙ */
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme=light]) {
+                --bg: #12161d;
+                --fg: #e6e9ef;
+                --card: #1b212b;
+                --mu: #98a2b3;
+                --bd: #2d3644;
+                --ac: #6ea8ff;
+                --ac2: #1d2a44;
+                color-scheme: dark
+            }
+        }
+
+        /* হাতে ডার্ক থিম সেট করা থাকলে ডার্ক রঙ */
+        :root[data-theme=dark] {
+            --bg: #12161d;
+            --fg: #e6e9ef;
+            --card: #1b212b;
+            --mu: #98a2b3;
+            --bd: #2d3644;
+            --ac: #6ea8ff;
+            --ac2: #1d2a44;
+            color-scheme: dark
+        }
+
+        /* সব এলিমেন্টে box-sizing ঠিক করা */
+        * {
+            box-sizing: border-box
+        }
+
+        /* স্ক্রল করার সময় ওপরের সেফ-এরিয়া ছাড়া */
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        /* পাতার সাধারণ ব্যাকগ্রাউন্ড, রঙ ও ফন্ট */
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--fg);
+            font: 15px/1.5 'Noto Sans Bengali', system-ui, sans-serif
+        }
+
+        /* ওপরের নেভিগেশন বার (স্টিকি) */
+        .nav {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 10px 14px;
+            background: var(--card);
+            border-bottom: 1px solid var(--bd);
+            position: sticky;
+            top: env(safe-area-inset-top, 0px);
+            z-index: 5;
+            align-items: center
+        }
+
+        /* নেভিগেশনের লোগো/শিরোনাম */
+        .nav b {
+            margin-right: 10px;
+            color: var(--ac)
+        }
+
+        /* মূল কনটেন্টের ঢাকনা (সর্বোচ্চ ১০০০px) */
+        .wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 14px
+        }
+
+        /* সাধারণ বাটনের স্টাইল */
+        button {
+            font: inherit;
+            border: 1px solid var(--bd);
+            background: var(--card);
+            color: var(--fg);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer
+        }
+
+        /* সক্রিয় (on) ও প্রধান (pr) বাটন */
+        button.on,
+        button.pr {
+            background: var(--ac);
+            color: #fff;
+            border-color: var(--ac)
+        }
+
+        /* নিষ্ক্রিয় বাটন */
+        button:disabled {
+            opacity: .4;
+            cursor: not-allowed
+        }
+
+        /* ছোট বাটন */
+        button.sm {
+            padding: 2px 8px;
+            font-size: 13px
+        }
+
+        /* ইনপুট, সিলেক্ট ও টেক্সটএরিয়ার স্টাইল */
+        input,
+        select,
+        textarea {
+            font: inherit;
+            color: var(--fg);
+            background: var(--bg);
+            border: 1px solid var(--bd);
+            border-radius: 8px;
+            padding: 6px 8px;
+            width: 100%
+        }
+
+        /* রেডিও ও চেকবক্সের প্রস্থ স্বাভাবিক রাখা */
+        input[type=radio],
+        input[type=checkbox] {
+            width: auto
+        }
+
+        /* লেবেলের স্টাইল */
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--mu);
+            margin-top: 8px
+        }
+
+        /* কার্ড ও সারির সাধারণ স্টাইল */
+        .card,
+        .row {
+            background: var(--card);
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: 8px 0
+        }
+
+        /* সারি: ডানে-বামে ভাগ করা বিন্যাস */
+        .row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            justify-content: space-between
+        }
+
+        /* সারির ভেতরের details অংশ জায়গা নেয় */
+        .row details {
+            flex: 1
+        }
+
+        /* ড্যাশবোর্ডের কার্ডের গ্রিড */
+        .g3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px
+        }
+
+        /* কার্ডের বড় সংখ্যা */
+        .g3 .card b {
+            font-size: 26px;
+            display: block
+        }
+
+        /* ছোট ট্যাগ (chip) */
+        .chip {
+            background: var(--ac2);
+            color: var(--ac);
+            border-radius: 6px;
+            padding: 0 6px;
+            font-size: 12px;
+            white-space: nowrap
+        }
+
+        /* ম্লান (muted) লেখার রঙ */
+        .mu,
+        small {
+            color: var(--mu)
+        }
+
+        /* সারিতে সাজানো ইনপুট (রেডিও ও অপশন) */
+        .r {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin: 4px 0
+        }
+
+        /* ফিল্টার বারের ফ্লেক্স সারি */
+        .fl {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center
+        }
+
+        /* ফ্লেক্স সারির ভেতরের এলিমেন্টের প্রস্থ স্বয়ংক্রিয় */
+        .fl>* {
+            width: auto
+        }
+
+        /* সার্চ ইনপুট জায়গা নেয় */
+        .fl input.s {
+            flex: 1;
+            min-width: 150px
+        }
+
+        /* দুই কলামের বিন্যাস */
+        .two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        /* ছোট স্ক্রিনে দুই কলাম এক কলাম হয় */
+        @media(max-width:700px) {
+            .two {
+                grid-template-columns: 1fr
+            }
+        }
+
+        /* চিহ্নের প্যালেট */
+        .pal {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin: 6px 0
+        }
+
+        /* প্রিভিউ অংশের ওপরে রেখা */
+        .pv {
+            padding: 6px;
+            border-top: 1px solid var(--bd);
+            margin-top: 6px
+        }
+
+        /* প্রিন্ট প্রিভিউ এলাকা: চওড়া হলে আড়াআড়ি স্ক্রল */
+        #print {
+            overflow-x: auto
+        }
+
+        /* মাপার জন্য লুকানো এলাকা (স্ক্রিনের বাইরে) */
+        #meas {
+            position: absolute;
+            left: -99999px;
+            top: 0
+        }
+
+        /* পাতা ও মাপার এলাকার ফন্ট ও রঙ */
+        .pg,
+        .mz {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            line-height: 1.35;
+            color: #000
+        }
+
+        /* A4 পাতার মাপ ও স্টাইল */
+        .pg {
+            width: 210mm;
+            height: 297mm;
+            padding: 9mm;
+            background: #fff;
+            margin: 12px auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 2px 12px #0004
+        }
+
+        /* লেখা মাপার লুকানো বক্স */
+        .mz {
+            position: absolute;
+            visibility: hidden
+        }
+
+        /* পাতার কলামগুলোর ঢাকনা */
+        .cols {
+            flex: 1;
+            display: flex;
+            gap: 4mm;
+            min-height: 0
+        }
+
+        /* একটি কলাম (ডানে বিভাজক রেখা) */
+        .col {
+            flex: 1;
+            min-width: 0;
+            overflow: visible;
+            clip-path: inset(0 0 0 -2mm);
+            border-right: .3mm solid #999;
+            padding-right: 2mm
+        }
+
+        /* শেষ কলামে বিভাজক নেই */
+        .col:last-child {
+            border: 0
+        }
+
+        /* প্রতিষ্ঠানের নাম (বড় শিরোনাম) */
+        .h1 {
+            font-size: 2.3em;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.1
+        }
+
+        /* পরীক্ষার নাম ও উপশিরোনাম মাঝখানে */
+        .h3,
+        .h4 {
+            text-align: center
+        }
+
+        /* পরীক্ষার নাম বোল্ড ও বড় */
+        .h3 {
+            font-weight: 700;
+            font-size: 1.15em
+        }
+
+        /* "উত্তরসহ" লেবেলের বর্ডার */
+        .bd {
+            border: .3mm solid #000;
+            padding: 0 2mm;
+            font-size: .8em
+        }
+
+        /* সময়, বিষয় কোড, তারিখ ও পূর্ণমানের সারি */
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            border-top: .3mm solid #000;
+            border-bottom: .3mm solid #000;
+            margin: 1.5mm 0;
+            padding: .5mm 0;
+            font-weight: 700
+        }
+
+        /* বিশেষ দ্রষ্টব্যের লেখা (ইটালিক) */
+        .sp {
+            font-size: .78em;
+            font-style: italic;
+            margin-bottom: 2mm
+        }
+
+        /* পরের পাতার ছোট হেডার */
+        .h2 {
+            font-weight: 700;
+            border-bottom: .3mm solid #000;
+            margin-bottom: 2mm;
+            font-size: 1em
+        }
+
+        /* একটি প্রশ্নের গ্রিড (নম্বর ও প্রশ্ন) */
+        .qn {
+            padding-bottom: 1.8mm;
+            white-space: pre-wrap;
+            display: grid;
+            grid-template-columns: 1.9em minmax(0, 1fr)
+        }
+
+        /* উদ্দীপক ব্লক: ফাঁকা নম্বর-কলাম নেই, লেখা নম্বরের অবস্থান থেকেই শুরু হয় */
+        .qn.qs {
+            grid-template-columns: minmax(0, 1fr);
+            margin-left: -1.2mm
+        }
+
+        /* প্রশ্নের নম্বর (একটু বামে সরানো) */
+        .qno {
+            font-weight: 700;
+            margin-left: -1.2mm
+        }
+
+        /* প্রশ্নের অংশ */
+        .qb {
+            min-width: 0
+        }
+
+        /* উদ্দীপকের ঘোষণা লাইনে জাস্টিফাই */
+        .it {
+            text-align: justify
+        }
+
+        /* উদ্দীপকের ঘোষণা লাইন ইটালিক ও বোল্ড */
+        .it {
+            font-style: italic;
+            font-weight: 700
+        }
+
+        /* বিবৃতির লেখা জাস্টিফাই */
+        .st {
+            text-align: justify
+        }
+
+        /* অপশন দুই কলামে (ছোট অপশন) */
+        .op.g2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 2mm
+        }
+
+        /* অপশন দুই কলামে (মাপ অনুযায়ী) */
+        .op.l2 {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            column-gap: 2mm
+        }
+
+        /* অপশন চার কলামে (মাপ অনুযায়ী) */
+        .op.l4 {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            column-gap: 2mm
+        }
+
+        /* i, ii, iii বিবৃতি এক লাইনে */
+        .sts.r1 {
+            display: flex;
+            gap: 2mm
+        }
+
+        /* এক লাইনের বিবৃতিতে লাইন না ভাঙা */
+        .sts.r1 .st {
+            padding: 0;
+            white-space: nowrap
+        }
+
+        /* কোডের লেখা (মনোস্পেস ও বর্ডার) */
+        .cd {
+            font: .85em/1.25 monospace;
+            white-space: pre-wrap;
+            margin: 1mm 0;
+            border: .2mm solid #999;
+            padding: 1mm
+        }
+
+        /* প্রিভিউতে প্রশ্নের নিচে ফাঁকা নেই */
+        .pv .qn {
+            padding: 0
+        }
+
+        /* প্রশ্নের লেখা জাস্টিফাই */
+        .jt {
+            text-align: justify
+        }
+
+        /* বোর্ড ট্যাগের ছোট লেখা */
+        .bt {
+            font-size: .8em;
+            white-space: nowrap
+        }
+
+        /* এডিটরের দুই কলাম (ফর্ম ও প্রিভিউ) */
+        .ed2 {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+            gap: 14px;
+            align-items: start
+        }
+
+        /* ডুপ্লিকেট-চেক প্যানেল স্টিকি */
+        .ed2>#sim {
+            position: sticky;
+            top: 64px;
+            max-height: 80vh;
+            overflow: auto;
+            margin: 8px 0
+        }
+
+        /* ছোট স্ক্রিনে এডিটর এক কলাম */
+        @media(max-width:800px) {
+            .ed2 {
+                grid-template-columns: 1fr
+            }
+
+            .ed2>#sim {
+                position: static
+            }
+        }
+
+        /* টানার যোগ্য প্রশ্নে grab কার্সার */
+        .di {
+            cursor: grab
+        }
+
+        /* টানার সময় লক্ষ্যে ড্যাশ বর্ডার */
+        .di.ov {
+            outline: 2px dashed #1f6feb;
+            outline-offset: 1px
+        }
+
+        /* অপশনের বৃত্ত (ক, খ, গ, ঘ) */
+        .ol {
+            display: inline-block;
+            width: 1.5em;
+            height: 1.5em;
+            line-height: 1.5em;
+            border: .25mm solid currentColor;
+            border-radius: 50%;
+            text-align: center;
+            font-size: .85em;
+            margin-right: .5mm;
+            vertical-align: middle
+        }
+
+        /* সঠিক উত্তরের ভরাট বৃত্ত (প্রিন্টেও রঙ থাকে) */
+        .ol.on {
+            background: var(--fg);
+            color: var(--bg);
+            font-weight: 700;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact
+        }
+
+        /* পাতা ও মাপার এলাকায় ভরাট বৃত্ত কালো */
+        .pg .ol.on,
+        .mz .ol.on {
+            background: #000;
+            color: #fff
+        }
+
+        /* পাতার ভেতরে বিন্যাসের জন্য position */
+        .pg {
+            position: relative
+        }
+
+        /* MathML গণিতের লেখার মাপ */
+        math {
+            font-size: 1.05em
+        }
+
+        /* ওভারলাইন (ওপরে দাগ) */
+        .ov {
+            display: inline-block;
+            border-top: .08em solid currentColor;
+            padding-top: .06em;
+            line-height: 1.15;
+            margin: 0 .03em
+        }
+
+        /* নেস্টেড ওভারলাইনে বাড়তি জায়গা */
+        .ov:has(.ov) {
+            padding-top: .22em
+        }
+
+        /* প্রথম পাতার হেডারের ঢাকনা */
+        .h1w {
+            position: relative
+        }
+
+        /* সেট কোডের বক্স (হেডারের বামে) */
+        .sc {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 700;
+            font-size: .85em;
+            border: .25mm solid #000;
+            padding: 0 1.5mm
+        }
+
+        /* ছবি ড্রপ করার এলাকা */
+        .dz {
+            border: 2px dashed var(--bd);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            color: var(--mu);
+            font-size: 13px;
+            margin-top: 4px
+        }
+
+        /* ফোকাস বা ড্র্যাগের সময় এলাকার রঙ */
+        .dz:focus,
+        .dz.ov {
+            border-color: var(--ac);
+            outline: 0
+        }
+
+        /* প্রিন্টের পাতা A4, মার্জিন নেই */
+        @page {
+            size: A4;
+            margin: 0
+        }
+
+        /* শেষ পাতার পর পেজ ব্রেক নেই */
+        #print .pg:last-child {
+            break-after: auto
+        }
+
+        /* প্রিন্টের সময়ের স্টাইল */
+        @media print {
+            /* প্রিন্টে লুকানো অংশ (নেভিগেশন, বাটন) */
+            .no-print {
+                display: none !important
+            }
+
+            /* প্রিন্টে সাদা ব্যাকগ্রাউন্ড */
+            body {
+                background: #fff
+            }
+
+            /* প্রিন্টে প্যাডিং ও সীমা নেই */
+            .wrap {
+                padding: 0;
+                max-width: none
+            }
+
+            /* প্রিন্টে স্ক্রল নেই */
+            #print {
+                overflow: visible
+            }
+
+            /* প্রিন্টে প্রতিটি পাতা আলাদা পেজ */
+            .pg {
+                box-shadow: none;
+                margin: 0;
+                break-after: page
+            }
+        }
+    </style>
+</head>
+
+<!-- বডি অংশ -->
+<body>
+    <!-- অ্যাপের সব পাতা (ড্যাশবোর্ড, প্রশ্নব্যাংক ইত্যাদি) JavaScript দিয়ে এখানে আঁকা হয় -->
+    <div id="app"></div>
+    <!-- লেআউট মাপার লুকানো এলাকা (পেজে দেখা যায় না) -->
+    <div id="meas"></div>
+    <!-- Supabase ডেটাবেস লাইব্রেরি -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+    <!-- অ্যাপের মূল JavaScript (নিচে) -->
+    <script>
+        // =====================================================================
+        // Zenith ICT Care – প্রশ্নব্যাংক: মূল JavaScript
+        // কাজের ক্রম: ইউটিলিটি → রেন্ডারিং → লেআউট → ভিউ → অ্যাকশন → সেট →
+        //             প্রিভিউ/ড্র্যাগ → ব্যাকআপ → বোর্ড/সাল → Supabase → লগইন
+        // =====================================================================
+
+
+        // ---------- ইউটিলিটি ও গ্লোবাল ভ্যারিয়েবল ----------
+        // document.querySelector-এর সংক্ষিপ্ত রূপ
+        const $ = (s) => document.querySelector(s);
+
+        // বাংলা অঙ্কের তালিকা (ইংরেজি সংখ্যা বদলানোর জন্য)
+        const BD = "০১২৩৪৫৬৭৮৯";
+
+        // যেকোনো সংখ্যাকে বাংলা অঙ্কে বদলায় (যেমন 25 → ২৫)
+        const bn = (n) => String(n).replace(/\d/g, (d) => BD[d]);
+
+        // অপশনের লেবেল: ক, খ, গ, ঘ
+        const LB = ["ক", "খ", "গ", "ঘ"];
+
+        // বহুপদী প্রশ্নের ডিফল্ট চারটি অপশন
+        const MD = ["i ও ii", "i ও iii", "ii ও iii", "i, ii ও iii"];
+
+        // উদ্দীপকভিত্তিক প্রশ্নের ঘোষণা লাইনের ডিফল্ট তালিকা
+        const PRE = ["নিচের উদ্দীপকটি পড়ো এবং", "নিচের চিত্রটি লক্ষ করো এবং", "নিচের সারণিটি দেখো এবং", "উদ্দীপকের আলোকে"];
+
+        // প্রশ্নের ধরনের প্রদর্শন নাম
+        const TY = { single: "Single", multi: "Multiple", group: "উদ্দীপক" };
+
+        // HTML-এ বিশেষ চিহ্ন (&, <, >) নিরাপদ করার ফাংশন
+        const esc = (s) => String(s == null ? "" : s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+
+        // ---------- অ্যাপের মূল ডেটা ও বর্তমান অবস্থা (state) ----------
+        // S = ডেটাবেস থেকে আনা সব ডেটা (অধ্যায়, প্রশ্ন, সেট, বোর্ড, সাল)
+        let S = { ch: [], q: [], sets: [], boards: [], years: [] };
+
+        // SRC = প্রশ্নের উৎস (বোর্ড ও সাল) এর মানচিত্র
+        let SRC = {};
+
+        // view = এখন কোন পাতা (ভিউ) দেখানো হচ্ছে
+        let view = "dash";
+
+        // F = প্রশ্নব্যাংকের ফিল্টারের অবস্থা
+        let F = { s: "", ch: "", t: "", b: "", y: "" };
+
+        // ed = এখন যে প্রশ্নটি এডিট হচ্ছে
+        let ed = null;
+
+        // cur = এখন যে সেটটি খোলা আছে
+        let cur = null;
+
+        // last = সর্বশেষ পেজ লেআউটের ফলাফল
+        let last = null;
+
+        // ver = প্রিভিউর ধরন (q = শুধু প্রশ্ন, a = উত্তরসহ, b = দুটোই)
+        let ver = "q";
+
+        // lf = সর্বশেষ যে ইনপুট বা টেক্সটএরিয়াতে ফোকাস ছিল
+        let lf = null;
+
+        // localStorage থেকে ব্যবহারকারীর সেটিং পড়ে (ব্যর্থ হলে ফাঁকা)
+        try {
+          S.opt = JSON.parse(localStorage.getItem("zic_opt")) || {};
+        } catch (e) {
+          S.opt = {};
+        }
+
+        // সেটিং localStorage-এ সংরক্ষণ করে
+        const save = () => {
+          try {
+            localStorage.setItem("zic_opt", JSON.stringify(S.opt || {}));
+          } catch (e) {
+          }
+        };
+
+        // নতুন র‍্যান্ডম UUID তৈরি করে
+        const uid = () => "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+          const r = Math.random() * 16 | 0;
+          return (c == "x" ? r : r & 3 | 8).toString(16);
+        });
+
+        // প্রশ্নটি কয়টি প্রশ্ন গণ্য হবে (উদ্দীপকে উপপ্রশ্ন সংখ্যা, নাহলে ১)
+        const units = (q) => q.type == "group" ? q.kids.length : 1;
+
+        // অধ্যায়ের আইডি থেকে "অধ্যায় ১: নাম" লেখা বানায়
+        const chn = (id) => {
+          const c = S.ch.find((x) => x.id == id);
+          return c ? "অধ্যায় " + bn(c.n) + ": " + c.name : "—";
+        };
+
+        // একটি নতুন ফাঁকা উপপ্রশ্ন (single বা multi) তৈরি করে
+        const ns = (t) => ({ type: t || "single", text: "", img: "", st: ["", "", ""], opts: t == "multi" ? [...MD] : ["", "", "", ""], ans: -1 });
+
+        // একটি নতুন ফাঁকা প্রশ্নের অবজেক্ট তৈরি করে
+        const newQ = () => ({ id: uid(), ch: F.ch || "", src: [], note: "", stem: { pre: PRE[0], text: "", code: "", img: "" }, kids: [ns()], ...ns() });
+
+        // "a.b.c" পথ ধরে অবজেক্টের ভেতরে মান বসায়
+        const setp = (o, k, v) => {
+          const a = k.split(".");
+          a.slice(0, -1).forEach((x) => o = o[x]);
+          o[a.pop()] = v;
+        };
+
+        // ---------- প্রশ্ন রেন্ডারিং ----------
+        // PT = প্রিন্টে বোর্ড ট্যাগ, EX = সব Expand, LM = লেআউট মোড
+        let PT = false;
+        let EX = false;
+        let LM = false;
+
+        // প্রিন্টে বোর্ড ট্যাগের HTML (যেমন [ঢা: বো: ’২৫])
+        const T = (q) => PT && tag(q) ? " <span class=bt>[" + esc(tag(q)) + "]</span>" : "";
+
+        // সেটিং চালু আছে কিনা (ডিফল্ট চালু)
+        const OP = (k) => !S.opt || S.opt[k] !== false;
+
+        // তালিকায় প্রশ্নের পাশে বোর্ড ও সালের ট্যাগ
+        const bt2 = (q) => OP("l") && tag(q) ? " • " + esc(tag(q)) : "";
+
+        // ছবির <img> ট্যাগ তৈরি করে
+        const imgH = (i) => i ? `<img src="${i}" style="max-width:100%;display:block;margin:1mm auto">` : "";
+
+        // MX = গণিত মোড (MathML) চালু আছে কিনা
+        let MX = false;
+
+        // LaTeX কমান্ড → ইউনিকোড চিহ্নের তালিকা
+        const MS = { le: "≤", leq: "≤", ge: "≥", geq: "≥", ne: "≠", neq: "≠", times: "×", div: "÷", oplus: "⊕", cdot: "·", to: "→", rightarrow: "→", Rightarrow: "⇒", pm: "±", cdots: "…", ldots: "…", dots: "…" };
+
+        // ঊর্ধ্বলিখন (সুপারস্ক্রিপ্ট) অক্ষরের তালিকা
+        const SUP = { 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹", "+": "⁺", "-": "⁻", n: "ⁿ" };
+
+        // নিম্নলিখন (সাবস্ক্রিপ্ট) অক্ষরের তালিকা
+        const SUB = { 0: "₀", 1: "₁", 2: "₂", 3: "₃", 4: "₄", 5: "₅", 6: "₆", 7: "₇", 8: "₈", 9: "₉" };
+
+        // সব অক্ষর ম্যাপে থাকলে ইউনিকোড অক্ষরে বদলায়, নাহলে ^ বা _ সহ মূল লেখা ফেরত দেয়
+        const mp = (x, M, p) => x && [...x].every((c) => M[c]) ? [...x].map((c) => M[c]).join("") : p + x;
+
+        // ওভারলাইনের সম্মিলিত চিহ্ন (ইউনিকোড ৭৭৩)
+        const OV = String.fromCharCode(773);
+
+        // LaTeX লেখাকে সাধারণ ইউনিকোড লেখায় বদলায়
+        function ltx2txt(s) {
+          // $ চিহ্ন সরিয়ে ফেলে
+          s = String(s).replace(/\$\$?/g, "");
+          // \overline, \text, \frac, \sqrt ইত্যাদি তিন ধাপে সরল করে
+          for (let k = 0; k < 3; k++) s = s.replace(/\\(?:overline|bar)\{([^{}]*)\}/g, (_, a) => a.length > 1 ? "~{" + a + "}" : "~" + a).replace(/\\(?:text|mathrm|mathbf|textbf|mbox|operatorname)\{([^{}]*)\}/g, "$1").replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, (_, a, b) => (a.length > 1 ? "(" + a + ")" : a) + "/" + (b.length > 1 ? "(" + b + ")" : b)).replace(/\\sqrt\{([^{}]*)\}/g, (_, a) => "√" + (a.length > 1 ? "(" + a + ")" : a));
+          // ঊর্ধ্ব (^) ও নিম্ন (_) লিখনকে ইউনিকোড অক্ষরে বদলায়
+          s = s.replace(/\^\{([^{}]*)\}/g, (_, a) => mp(a, SUP, "^")).replace(/\^(\w)/g, (_, a) => mp(a, SUP, "^")).replace(/_\{([^{}]*)\}/g, (_, a) => mp(a, SUB, "_")).replace(/_(\w)/g, (_, a) => mp(a, SUB, "_"));
+          // \le, \times ইত্যাদি চিহ্ন বদলায় ও বাড়তি কমান্ড পরিষ্কার করে
+          s = s.replace(/\\(le|leq|ge|geq|ne|neq|times|div|oplus|cdot|to|rightarrow|Rightarrow|pm|cdots|ldots|dots)\b/g, (_, a) => MS[a]).replace(/\\(?:left|right|quad|qquad)\b/g, " ").replace(/\\[,;! ]/g, " ").replace(/\\([{}%&_#$])/g, "$1").replace(/\\([a-zA-Z]+)/g, "$1");
+          // একাধিক স্পেসকে এক স্পেসে কমায়
+          return s.replace(/ {2,}/g, " ");
+        }
+
+        // LaTeX লেখাকে MathML-এ রূপান্তর করে (গণিত মোডের জন্য)
+        function m2(s) {
+          // i = পড়ার বর্তমান অবস্থান
+          let i = 0;
+          // { } এর ভেতরের কাঁচা লেখা পড়ে (যেমন \text{...})
+          const raw = () => {
+            let r = "";
+            if (s[i] == "{") {
+              i++;
+              while (i < s.length && s[i] != "}") r += s[i++];
+              i++;
+            }
+            return r;
+          };
+          // একটি একক উপাদান (অক্ষর, সংখ্যা বা কমান্ড) MathML-এ বদলায়
+          const atom = () => {
+            const c = s[i++];
+            // { } গ্রুপকে <mrow>-এ বদলায়
+            if (c == "{") {
+              const r = seq("}");
+              i++;
+              return "<mrow>" + r + "</mrow>";
+            }
+            // ব্যাকস্ল্যাশ কমান্ড (\frac, \sqrt, \overline ইত্যাদি) সামলায়
+            if (c == "\\") {
+              let n = "";
+              while (/[a-zA-Z]/.test(s[i] || "")) n += s[i++];
+              // ব্যাকস্ল্যাশের পর বিশেষ চিহ্ন বা স্পেস থাকলে
+              if (!n) {
+                const x = s[i++] || "";
+                return /[ ,;!]/.test(x) ? '<mspace width="0.3em"></mspace>' : "<mo>" + esc(x) + "</mo>";
+              }
+              // \overline বা \bar → ওপরে দাগ
+              if (n == "overline" || n == "bar") return "<mover>" + atom() + '<mo stretchy="true">¯</mo></mover>';
+              // \frac → ভগ্নাংশ
+              if (n == "frac") {
+                const a = atom();
+                const b = atom();
+                return "<mfrac>" + a + b + "</mfrac>";
+              }
+              // \sqrt → বর্গমূল
+              if (n == "sqrt") return "<msqrt>" + atom() + "</msqrt>";
+              // \text ধরনের কমান্ড → সাধারণ লেখা
+              if (/^(text|mathrm|mathbf|textbf|mbox|operatorname)$/.test(n)) return "<mtext>" + esc(raw()) + "</mtext>";
+              // \left ও \right উপেক্ষা করে
+              if (n == "left" || n == "right") return "";
+              // পরিচিত চিহ্ন হলে সেটি, নাহলে নাম হিসেবে দেখায়
+              return MS[n] ? "<mo>" + MS[n] + "</mo>" : "<mi>" + n + "</mi>";
+            }
+            // সংখ্যা পড়ে
+            if (/\d/.test(c)) {
+              let n = c;
+              while (/[\d.]/.test(s[i] || "")) n += s[i++];
+              return "<mn>" + n + "</mn>";
+            }
+            // ইংরেজি বা বাংলা অক্ষর
+            if (/[A-Za-z\u0980-\u09FF]/.test(c)) return "<mi>" + c + "</mi>";
+            // বাকি সব চিহ্ন
+            return c == " " ? "" : "<mo>" + esc(c) + "</mo>";
+          };
+          // উপাদানের পর ^ (ঊর্ধ্ব) বা _ (নিম্ন) থাকলে msup/msub বানায়
+          const post = () => {
+            let b = atom();
+            while (s[i] == "^" || s[i] == "_") {
+              const u = s[i++] == "^";
+              const g = u ? "sup" : "sub";
+              b = "<m" + g + ">" + b + atom() + "</m" + g + ">";
+            }
+            return b;
+          };
+          // নির্দিষ্ট শেষ চিহ্ন পর্যন্ত ক্রমানুসারে উপাদান পড়ে
+          const seq = (e) => {
+            let r = "";
+            while (i < s.length && s[i] != e) r += post();
+            return r;
+          };
+          // পুরো লেখাকে <math> ট্যাগে মুড়ে ফেরত দেয়
+          return "<math>" + seq("") + "</math>";
+        }
+
+        // ~A ও ~{AB} লেখাকে ওভারলাইন span-এ বদলায়
+        const ovm = (h) => {
+          for (let i = 0; i < 5; i++) {
+            const p = h;
+            h = h.replace(/~\{([^{}]*)\}/g, "<span class=ov>$1</span>").replace(/~\(([^()]*)\)/g, "<span class=ov>$1</span>");
+            if (h == p) break;
+          }
+          return h.replace(/~([A-Za-z0-9\u0980-\u09FF])/g, "<span class=ov>$1</span>");
+        };
+
+        // লেখাকে দেখানোর উপযোগী HTML-এ বদলায় (গণিত মোডে $...$ অংশ MathML হয়)
+        const rt = (s, mx) => mx ? String(s == null ? "" : s).split(/(\$\$?[^$]+\$\$?)/).map((p, i) => i % 2 ? m2(p.replace(/^\$+|\$+$/g, "")) : ovm(esc(p))).join("") : ovm(esc(s));
+
+        // প্রতিটি প্রশ্নের অপশন-লেআউট মনে রাখার WeakMap
+        const OL = new WeakMap();
+
+        // একটি অপশনের HTML (সঠিক উত্তর হলে ভরাট বৃত্ত ও বোল্ড)
+        const optH = (o, i, A) => {
+          const c = A && o.ans == i;
+          return `<span class="ol${c ? " on" : ""}">${LB[i]}</span> ${c ? "<b>" + rt(o.opts[i], MX) + "</b>" : rt(o.opts[i], MX)}`;
+        };
+
+        // একটি উপপ্রশ্নের HTML তৈরি করে
+        function sub(o, n, A, t) {
+          // মাপা লেআউট আছে কিনা এবং অপশন ছোট কিনা দেখে
+          const L = LM && OL.get(o) || {};
+          const sh = o.opts.every((x) => x.length <= 13);
+          // প্রশ্নের লেখা, ছবি, (multi হলে i/ii/iii বিবৃতি) ও অপশন বসায়
+          return `<div class=qn><div class=qno>${bn(n)}.</div><div class=qb><div class=jt>${rt(o.text, MX)}${t || ""}</div>${imgH(o.img)}` + (o.type == "multi" ? '<div class="sts' + (L.s ? " r1" : "") + '">' + o.st.map((s, i) => `<div class=st>${["i", "ii", "iii"][i]}. ${rt(s, MX)}</div>`).join("") + "</div><div class=jt>নিচের কোনটি সঠিক?</div>" : "") + `<div class="op ${L.o || (sh ? "g2" : "")}">` + o.opts.map((x, i) => "<div>" + optH(o, i, A) + "</div>").join("") + "</div></div></div>";
+        }
+
+        // পুরো প্রশ্ন ব্লকের HTML (সাধারণ প্রশ্ন বা উদ্দীপক গ্রুপ)
+        function blk(q, n, A, r) {
+          MX = !!q.mx;
+          // সাধারণ প্রশ্ন হলে সরাসরি sub() ব্যবহার করে
+          if (q.type != "group") return sub(q, n, A, T(q));
+          // উদ্দীপকের তথ্য প্রস্তুত করে
+          const k = q.kids.length;
+          const m = q.stem;
+          const R = r || { s: 1, a: 0, b: k };
+          const ids = (k > 1 ? bn(n) + " ও " + bn(n + 1) : bn(n)) + " নং প্রশ্নের";
+          // উদ্দীপকের ঘোষণা, লেখা, কোড ও ছবির পর উপপ্রশ্নগুলো বসায়
+          return (R.s ? `<div class="qn qs"><div class=qb><div class=it>${esc(m.pre)} ${ids} উত্তর দাও:</div>${m.text && m.ut !== false ? "<div class=jt>" + rt(m.text, MX) + "</div>" : ""}${m.code && m.uc !== false ? "<div class=cd>" + esc(m.code) + "</div>" : ""}${m.ui !== false ? imgH(m.img) : ""}</div></div>` : "") + q.kids.slice(R.a, R.b).map((o, i) => sub(o, n + R.a + i, A, R.a + i ? "" : T(q))).join("");
+        }
+
+        // ---------- লেআউট / পাতা ----------
+        // সেটের ডিফল্ট শিরোনাম, উপশিরোনাম ও বিশেষ দ্রষ্টব্য
+        const DEF_ORG = "Zenith ICT Care";
+        const DEF_SUB = "তথ্য ও যোগাযোগ প্রযুক্তি – বহুনির্বাচনি প্রশ্ন";
+        const DEF_NOTE = `সরবরাহকৃত বহুনির্বাচনি অভীক্ষার উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসংবলিত বৃত্তসমূহ হতে সঠিক/সর্বোৎকৃষ্ট উত্তরের বৃত্তটি (●) বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।`;
+
+        // সেটে মান না থাকলে ডিফল্ট মান ফেরত দেয়
+        const O = (k) => cur[k] != null ? cur[k] : { org: DEF_ORG, sub: DEF_SUB, scode: "২৯৫", note: DEF_NOTE }[k];
+
+        // পাতার হেডার (প্রথম পাতায় পূর্ণ শিরোনাম, পরের পাতায় ছোট হেডার)
+        const hdr = (p, A) => p ? `<div class=h2>${esc(O("org"))} – ${esc(cur.exam)} (পৃষ্ঠা ${bn(p + 1)})${A ? " • উত্তরসহ" : ""}</div>` : `<div class=h1w><div class=sc>${esc(cur.code || "")}</div><div class=h1>${esc(O("org"))}</div></div><div class=h3>${esc(cur.exam)}${A ? " <span class=bd>উত্তরসহ</span>" : ""}</div><div class=h4>${esc(O("sub"))}</div><div class=meta><span>সময়: ${esc(cur.time)}</span><span>বিষয় কোড: ${esc(O("scode"))}</span><span>${esc(cur.date)}</span><span>পূর্ণমান: ${esc(cur.marks)}</span></div><div class=sp>${esc(O("note"))}</div>`;
+
+        // একটি A4 পাতার HTML (হেডার ও কলাম)
+        const page = (p, cs, f, A, C = 3) => `<div class=pg style="font-size:${f}pt">${hdr(p, A)}<div class=cols>${Array.from({ length: C }, (_, i) => `<div class=col>${cs[i] || ""}</div>`).join("")}</div></div>`;
+
+        // পাতার লেআউট হিসাব করে, কোন প্রশ্ন কোন কলামে যাবে ঠিক করে
+        async function lay() {
+          // ফন্ট লোড শেষ হওয়া পর্যন্ত অপেক্ষা করে
+          await document.fonts.ready;
+          // সেটের প্রশ্নের তালিকা (U) ও ক্রমিক নম্বর তৈরি করে
+          const U = [];
+          let n = 1;
+          cur.ids.forEach((id) => {
+            const q = S.q.find((x) => x.id == id);
+            if (q) {
+              U.push({ q, n });
+              n += units(q);
+            }
+          });
+          // মাপার লুকানো এলাকা, কলাম সংখ্যা ও ফন্ট সাইজ নেয়
+          const M = $("#meas");
+          const C = cur.cc || 3;
+          const f = cur.fs || 10;
+          // দুটি ফাঁকা পাতা বসিয়ে কলামের উচ্চতা ও প্রস্থ মাপে
+          M.innerHTML = page(0, [], f, 0, C) + page(1, [], f, 0, C);
+          const c1 = M.children[0].querySelector(".col");
+          const c2 = M.children[1].querySelector(".col");
+          const H = [c1.clientHeight, c2.clientHeight];
+          const W = c1.clientWidth - parseFloat(getComputedStyle(c1).paddingRight);
+          // লেখার উচ্চতা মাপার লুকানো বক্স বানায়
+          const t = document.createElement("div");
+          t.className = "mz";
+          t.style.cssText = `width:${W}px;font-size:${f}pt`;
+          M.append(t);
+          // প্রতিটি প্রশ্নের অপশন সাজানোর ধরন (১, ২ বা ৪ কলাম) ঠিক করে
+          U.forEach((u) => {
+            MX = !!u.q.mx;
+            (u.q.type == "group" ? u.q.kids : [u.q]).forEach((o) => OL.set(o, ml(o, t, W - 1.9 * f * 4 / 3)));
+          });
+          // প্রশ্নে ছবি আছে কিনা দেখে
+          const imgq = (q) => q.type == "group" && (q.stem.ui !== false && q.stem.img || q.kids.some((k) => k.img));
+          // উদ্দীপকের একাধিক উপপ্রশ্ন ভেঙে আলাদা অংশে (P) ভাগ করে
+          const P = [];
+          U.forEach((u, ui) => {
+            const q = u.q;
+            const k = q.type == "group" ? q.kids.length : 0;
+            if (k > 1 && !imgq(q)) for (let a = 0; a < k; a++) P.push({ ui, q, n: u.n, r: a ? { s: 0, a, b: a + 1 } : { s: 1, a: 0, b: 1 } });
+            else P.push({ ui, q, n: u.n });
+          });
+          // প্রতিটি অংশের উচ্চতা মাপে
+          const hs = P.map((p) => {
+            t.innerHTML = blk(p.q, p.n, 0, p.r);
+            let h = 0;
+            [...t.children].forEach((c) => h += c.offsetHeight);
+            return h;
+          });
+          // অংশগুলো কলামে সাজায়, জায়গা শেষ হলে নতুন কলাম খোলে
+          const cols = [[]];
+          let used = 0;
+          P.forEach((p, i) => {
+            const c = cols.length - 1;
+            if (used + hs[i] > (c < C ? H[0] : H[1]) && cols[c].length) {
+              cols.push([]);
+              used = 0;
+            }
+            cols[cols.length - 1].push(i);
+            used += hs[i];
+          });
+          // মাপার এলাকা পরিষ্কার করে ফলাফল ফেরত দেয়
+          M.innerHTML = "";
+          return { U, P, cols, f, C, over: false };
+        }
+
+        // সব পাতার HTML তৈরি করে (প্রতিটি প্রশ্ন টেনে সাজানোর উপযোগী)
+        const pages = (L, A) => Array.from({ length: Math.max(1, Math.ceil(L.cols.length / L.C)) }, (_, p) => L.cols.slice(p * L.C, p * L.C + L.C)).map((cs, p) => page(p, cs.map((c) => c.map((i) => `<div class=di data-i="${L.P[i].ui}" draggable="true">${blk(L.P[i].q, L.P[i].n, A, L.P[i].r)}</div>`).join("")), L.f, A, L.C)).join("");
+
+        // ---------- সহায়ক ফাংশন ----------
+        // সেটে নির্বাচিত মোট প্রশ্ন সংখ্যা
+        const cnt = () => cur.ids.reduce((a, id) => {
+          const q = S.q.find((x) => x.id == id);
+          return a + (q ? units(q) : 0);
+        }, 0);
+
+        // সার্চের জন্য প্রশ্নের সব লেখা এক স্ট্রিংয়ে জড়ো করে
+        const hay = (q) => (q.type == "group" ? [q.stem.text, q.stem.code, ...q.kids.flatMap((k) => [k.text, ...k.st, ...k.opts])] : [q.text, ...q.st, ...q.opts]).concat(q.note, tag(q)).join(" ").toLowerCase();
+
+        // ফিল্টার অনুযায়ী প্রশ্ন বাছাই করে
+        const flt = () => S.q.filter((q) => (!F.ch || q.ch == F.ch) && (!F.b && !F.y || (q.src || []).some((s) => (!F.b || s.b == F.b) && (!F.y || s.y == F.y))) && (!F.t || q.type == F.t) && (!F.s || hay(q).includes(F.s.toLowerCase())));
+
+        // তালিকায় দেখানোর জন্য প্রশ্নের ছোট সারাংশ (৮০ অক্ষর, HTML)
+        const smh = (q) => {
+          let s = q.type == "group" ? "[উদ্দীপক] " + (q.stem.text || q.stem.code || "(ছবি)") : q.text || "(ছবি)";
+          s = s.slice(0, 80);
+          if (q.mx && (s.match(/\$/g) || []).length % 2) s = s.slice(0, s.lastIndexOf("$"));
+          return rt(s, q.mx);
+        };
+
+        // সারাংশের সাধারণ লেখা সংস্করণ
+        const sm = (q) => (q.type == "group" ? "[উদ্দীপক] " + (q.stem.text || q.stem.code || "(ছবি)") : q.text || "(ছবি)").slice(0, 80);
+
+        // <option> তালিকা তৈরি করে
+        const opt = (a, v, f) => a.map((x) => `<option value="${x[0]}" ${x[0] == v ? "selected" : ""}>${esc(x[1])}</option>`).join("");
+
+        // অধ্যায়ের <option> তালিকা তৈরি করে
+        const chOpts = (v, all) => opt([["", all || "-- অধ্যায় --"], ...S.ch.map((c) => [c.id, "অধ্যায় " + bn(c.n) + ": " + c.name])], v);
+
+        // ভিউ বদলে পুনরায় আঁকে
+        const go = (v) => {
+          view = v;
+          ed = null;
+          draw();
+        };
+
+        // প্রশ্নের তালিকার HTML (প্রশ্নব্যাংক ও সেট তৈরির পাতায় ব্যবহৃত)
+        const lst = () => {
+          // ফিল্টার করা প্রশ্ন, মোট সংখ্যা ও শিরোনাম লাইন
+          const a = flt();
+          const n = a.reduce((x, q) => x + units(q), 0);
+          const hd = '<div class=mu style="margin:4px 0">মোট <b>' + bn(n) + "</b> টি প্রশ্ন" + (n != a.length ? " (উদ্দীপকের প্রশ্নসহ)" : "") + "</div>";
+          // প্রতিটি প্রশ্নের সারি (সেট পাতায় চেকবক্স, ব্যাংকে এডিট/ডিলিট বাটন)
+          return hd + (a.length ? a.map((q) => view == "set" ? `<div class=row style="margin:4px 0"><input type=checkbox ${cur.ids.includes(q.id) ? "checked" : ""} onchange="tog('${q.id}',this.checked)"><details${EX ? " open" : ""}><summary><span class=chip>${TY[q.type]}</span> ${smh(q)}<br><small>${esc(chn(q.ch))}${bt2(q)} • ${bn(units(q))} টি প্রশ্ন</small></summary><div class=pv>${blk(q, 1, 1)}</div></details></div>` : `<div class=row><details${EX ? " open" : ""}><summary><span class=chip>${TY[q.type]}</span> ${smh(q)} <small>${esc(chn(q.ch))}${bt2(q)}</small></summary><div class=pv>${blk(q, 1, 1)}</div></details><span style="white-space:nowrap"><button class=sm onclick="editQ('${q.id}')">এডিট</button> <button class=sm onclick="delQ('${q.id}')">ডিলিট</button></span></div>`).join("") : "<p class=mu>কোনো প্রশ্ন নেই</p>");
+        };
+
+        // ফিল্টার বার: সার্চ বক্স, অধ্যায়/টাইপ/বোর্ড/সাল ড্রপডাউন ও চেকবক্স
+        const fbar = () => `<div class=fl><input class=s placeholder="🔍 প্রশ্ন সার্চ করো..." value="${esc(F.s)}" oninput="F.s=this.value;$('#lst').innerHTML=lst()"><select onchange="F.ch=this.value;draw()">${chOpts(F.ch, "সব অধ্যায়")}</select><select onchange="F.t=this.value;draw()">${opt([["", "সব টাইপ"], ["single", "Single"], ["multi", "Multiple"], ["group", "উদ্দীপক"]], F.t)}</select>${OP("f") ? `<select onchange="F.b=this.value;draw()">${opt([["", "সব বোর্ড"], ...S.boards.map((b) => [b.id, b.name])], F.b || "")}</select><select onchange="F.y=this.value;draw()">${opt([["", "সব সাল"], ...S.years.map((y) => [y.id, y.y])], F.y || "")}</select>` : ""}</div><div class=fl style="margin:2px 0 6px"><label style="margin:0"><input type=checkbox ${OP("f") ? "checked" : ""} onchange="S.opt=S.opt||{};S.opt.f=this.checked;save();draw()"> বোর্ড ফিল্টার</label><label style="margin:0"><input type=checkbox ${OP("l") ? "checked" : ""} onchange="S.opt=S.opt||{};S.opt.l=this.checked;save();draw()"> তালিকায় বোর্ড/সাল</label><button class=sm id=xb onclick="tgx()">${EX ? "সব Collapse করো" : "সব Expand করো"}</button></div>`;
+
+        // ওপরের নেভিগেশন বার
+        const nav = () => `<div class="nav no-print"><b>Zenith ICT Care</b>${[["dash", "ড্যাশবোর্ড"], ["ch", "অধ্যায়"], ["src", "বোর্ড ও সাল"], ["bank", "প্রশ্নব্যাংক"], ["set", "সেট তৈরি"], ["sets", "সেভ করা সেট"]].map((x) => `<button class="${view == x[0] ? "on" : ""}" onclick="${x[0] == "set" && !cur ? "newSet()" : "go('" + x[0] + "')"}">${x[1]}</button>`).join("")}<button class=sm style="margin-left:auto" onclick="logout()">লগআউট</button></div>`;
+
+        // ---------- ভিউ (পাতা) ----------
+        // ড্যাশবোর্ড পাতা
+        function vD() {
+          // নির্দিষ্ট ধরনের প্রশ্ন গোনে
+          const t = (k) => S.q.filter((q) => q.type == k).length;
+          // সারসংক্ষেপ কার্ড, দ্রুত বাটন, অধ্যায়ভিত্তিক প্রশ্ন, সেভ করা সেট ও ব্যাকআপ অংশের HTML ফেরত দেয়
+          return `<div class=g3><div class=card><b>${bn(S.ch.length)}</b>অধ্যায়</div><div class=card><b>${bn(S.q.reduce((a, q) => a + units(q), 0))}</b>মোট প্রশ্ন</div><div class=card><b>${bn(S.sets.length)}</b>সেভ করা সেট</div></div>
+<p class=mu>Single ${bn(t("single"))} • Multiple ${bn(t("multi"))} • উদ্দীপক ${bn(t("group"))} টি (এতে প্রশ্ন ${bn(S.q.filter((q) => q.type == "group").reduce((a, q) => a + units(q), 0))} টি)</p>
+<div class=fl><button class=pr onclick="go('ch')">+ নতুন অধ্যায়</button><button class=pr onclick="newQuestion()">+ নতুন প্রশ্ন</button><button class=pr onclick="newSet()">+ নতুন সেট</button></div>
+<h3>অধ্যায়ভিত্তিক প্রশ্ন</h3>${S.ch.length ? S.ch.map((c) => `<div class=row style="cursor:pointer" onclick="F.ch='${c.id}';go('bank')"><span>অধ্যায় ${bn(c.n)}: ${esc(c.name)}</span><span class=chip>${bn(S.q.filter((q) => q.ch == c.id).reduce((a, q) => a + units(q), 0))} টি</span></div>`).join("") : "<p class=mu>আগে অধ্যায় তৈরি করো।</p>"}
+<h3>সেভ করা সেট</h3>${S.sets.length ? S.sets.map((s) => `<div class=row><span><span class=chip>${esc(s.code || "—")}</span> ${esc(s.name)} <small>(${bn(s.ids.length)} টি আইটেম)</small></span><span style="white-space:nowrap"><button class=sm onclick="openSet('${s.id}')">খোলো</button> <button class=sm onclick="dupSet('${s.id}')">ডুপ্লিকেট</button> <button class=sm onclick="delSet('${s.id}')">ডিলিট</button></span></div>`).join("") : "<p class=mu>এখনো কোনো সেট নেই।</p>"}
+<h3>ব্যাকআপ (JSON)</h3><div class=card><textarea id=bk rows=3 placeholder="এখানে Export-এর টেক্সট আসবে বা Import-এর জন্য পেস্ট করো"></textarea><div class=fl style="margin-top:6px"><button onclick="exp()">Export</button><button onclick="imp()">Import (ডেটাবেসে যোগ করো)</button><input type=file accept=".json,application/json" onchange="fi(this)"><span id=ip class=mu></span></div></div>`;
+        }
+
+        // অধ্যায় ব্যবস্থাপনার পাতা
+        function vC() {
+          // পরবর্তী অধ্যায় নম্বর বের করে
+          const n = S.ch.length ? Math.max(...S.ch.map((c) => +c.n)) + 1 : 1;
+          // নতুন অধ্যায় যোগের ফর্ম ও অধ্যায়ের তালিকা
+          return `<div class=card><div class=fl><input id=cn type=number value=${n} style="width:90px"><input id=cm class=s placeholder="অধ্যায়ের নাম"><button class=pr onclick="addCh()">অধ্যায় যোগ</button></div></div>` + [...S.ch].sort((a, b) => a.n - b.n).map((c) => `<div class=row><span>অধ্যায় ${bn(c.n)}: ${esc(c.name)} <small>(${bn(S.q.filter((q) => q.ch == c.id).reduce((a, q) => a + units(q), 0))} প্রশ্ন)</small></span><span><button class=sm onclick="editCh('${c.id}')">এডিট</button> <button class=sm onclick="delCh('${c.id}')">ডিলিট</button></span></div>`).join("");
+        }
+
+        // প্রশ্নব্যাংক পাতা (এডিট চললে এডিটর, নাহলে তালিকা)
+        const vB = () => ed ? vE() : `<div class=fl style="justify-content:space-between"><h3 style="margin:0">প্রশ্নব্যাংক</h3><button class=pr onclick="newQuestion()">+ নতুন প্রশ্ন</button></div>${fbar()}<div id=lst>${lst()}</div>`;
+
+        // ছবি আপলোডের এলাকা (ড্রপ, পেস্ট বা ফাইল বাছাই)
+        const imgF = (k, v) => `<div class=dz tabindex=0 onfocus="pk='${k}'" onclick="pk='${k}'" ondragover="event.preventDefault();this.classList.add('ov')" ondragleave="this.classList.remove('ov')" ondrop="event.preventDefault();this.classList.remove('ov');imgFile(event.dataTransfer.files[0],'${k}')">ছবি এখানে ড্রপ করো, অথবা এখানে ক্লিক করে Ctrl+V দিয়ে পেস্ট করো</div><div class=fl style="margin-top:4px"><input type=file accept="image/*" onchange="upl(this,'${k}')">${v ? `<img src="${v}" style="height:44px"><button class=sm onclick="setp(ed,'${k}','');draw()">ছবি সরাও</button>` : ""}</div>`;
+
+        // একটি প্রশ্নের ফর্ম (লেখা, ছবি, বিবৃতি, অপশন ও সঠিক উত্তর)
+        const sf = (o, p) => `<label>প্রশ্ন</label><textarea data-k="${p}text" rows=2>${esc(o.text)}</textarea>${imgF(p + "img", o.img)}` + (o.type == "multi" ? [0, 1, 2].map((i) => `<label>${["i", "ii", "iii"][i]}.</label><input data-k="${p}st.${i}" value="${esc(o.st[i])}">`).join("") : "") + `<label>অপশন (সঠিকটি বেছে নাও)</label>` + [0, 1, 2, 3].map((i) => `<div class=r><input type=radio name="${p}a" data-k="${p}ans" value=${i} ${o.ans == i ? "checked" : ""}><b>${LB[i]}</b><input data-k="${p}opts.${i}" value="${esc(o.opts[i])}"></div>`).join("") + (o.type == "multi" ? `<button class=sm onclick="dflt('${p}')">ডিফল্ট অপশনে ফিরো</button>` : "");
+
+        // প্রশ্ন এডিটরের পাতা
+        function vE() {
+          // q = এডিট হওয়া প্রশ্ন
+          const q = ed;
+          // g = প্রশ্নটি উদ্দীপক কিনা
+          const g = q.type == "group";
+          // এডিটরের শিরোনাম, অধ্যায়/টাইপ/উৎস/নোট, গণিত মোড, LaTeX পরিষ্কার বাটন, চিহ্নের প্যালেট,
+          // উদ্দীপকের ঘর ও উপপ্রশ্ন (বা সাধারণ ফর্ম) এবং সেভ/বাতিল বাটন — সবই নিচের HTML-এ
+          return `<h3>${S.q.some((x) => x.id == q.id) ? "প্রশ্ন এডিট" : "নতুন প্রশ্ন"}</h3><div class=ed2><div><div class=card><div class=two><div><label>অধ্যায় (বাধ্যতামূলক)</label><select data-k=ch>${chOpts(q.ch)}</select></div><div><label>টাইপ</label><select data-k=type>${opt([["single", "Single"], ["multi", "Multiple (i, ii, iii)"], ["group", "উদ্দীপক"]], q.type)}</select></div><div style="grid-column:1/-1">${srcF(q)}</div><div><label>নোট / কিওয়ার্ড (সার্চের জন্য)</label><input data-k=note value="${esc(q.note)}"></div></div>
+<label><input type=checkbox data-k=mx ${q.mx ? "checked" : ""}> গণিত মোড: $...$ লেখা গণিতের আকারে দেখাবে (বন্ধ থাকলে পেস্ট করা LaTeX নিজে সাধারণ লেখা হবে)</label><button class=sm onclick="cleanAll()">🧹 এই প্রশ্নের LaTeX সাধারণ লেখায় বদলাও</button><div class=pal><button class=sm title="~A লিখলে A-এর ওপরে দাগ পড়ে" onmousedown="event.preventDefault();ins('~')">~ ওভারলাইন (১টি অক্ষর)</button><button class=sm title="~{A+B} লিখলে পুরো অংশের ওপরে দাগ পড়ে" onmousedown="event.preventDefault();ins('~{}')">~{ } ওভারলাইন (অংশ)</button>${["₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉", "²", "≤", "≥", "≠", "×", "÷", "⊕", "̅"].map((c) => `<button class=sm onmousedown="event.preventDefault();ins('${c}')">${c == "̅" ? "ওভারলাইন (অক্ষরের পরে)" : c}</button>`).join("")}</div>
+${g ? `<label>ঘোষণা লাইন</label><select data-k=stem.pre>${opt(PRE.map((x) => [x, x]), q.stem.pre)}</select><label><input type=checkbox data-k=stem.ut ${q.stem.ut !== false ? "checked" : ""}> উদ্দীপক (লেখা) – প্রশ্নে যোগ হবে</label><textarea data-k=stem.text rows=3>${esc(q.stem.text)}</textarea><label><input type=checkbox data-k=stem.uc ${q.stem.uc !== false ? "checked" : ""}> উদ্দীপক (কোড) – প্রশ্নে যোগ হবে</label><textarea data-k=stem.code rows=3 style="font-family:monospace">${esc(q.stem.code)}</textarea><label><input type=checkbox data-k=stem.ui ${q.stem.ui !== false ? "checked" : ""}> উদ্দীপক (ছবি) – প্রশ্নে যোগ হবে</label>${imgF("stem.img", q.stem.img)}` + q.kids.map((o, i) => `<div class=card><div class=fl><b>প্রশ্ন ${bn(i + 1)}</b><select data-k="kids.${i}.type">${opt([["single", "Single"], ["multi", "Multiple"]], o.type)}</select>${q.kids.length > 1 ? `<button class=sm onclick="ed.kids.splice(${i},1);draw()">সরাও</button>` : ""}</div>${sf(o, "kids." + i + ".")}</div>`).join("") + (q.kids.length < 2 ? `<button onclick="ed.kids.push(ns());draw()">+ দ্বিতীয় প্রশ্ন</button>` : "") : sf(q, "")}
+<div class=fl style="margin-top:12px"><button class=pr onclick="saveQ()">সেভ করো</button><button onclick="ed=null;draw()">বাতিল</button></div></div></div><div id=sim class=card></div></div>`;
+        }
+
+        // সেটে নির্বাচিত প্রশ্নের তালিকা (↑ ↓ ✕ বাটনসহ)
+        const selH = () => `<b>মোট ${bn(cnt())} টি প্রশ্ন নির্বাচিত</b>` + cur.ids.map((id, i) => {
+          const q = S.q.find((x) => x.id == id);
+          return q ? `<div class=row style="margin:4px 0"><span><small>${bn(i + 1)}.</small> ${smh(q)}</span><span style="white-space:nowrap"><button class=sm onclick="mv(${i},-1)">↑</button><button class=sm onclick="mv(${i},1)">↓</button><button class=sm onclick="tog('${id}',false)">✕</button></span></div>` : "";
+        }).join("");
+
+        // সেট তৈরির পাতা
+        function vS() {
+          // প্রশ্ন সংখ্যা অনুযায়ী সময় ও পূর্ণমান (অটো চালু থাকলে) নবায়ন করে
+          syncAuto();
+          // একটি লেখার ইনপুট ঘর বানানোর ছোট ফাংশন
+          const f = (k, l) => `<div><label>${l}</label><input value="${esc(cur[k])}" oninput="cur.${k}=this.value"></div>`;
+          // সময় ও পূর্ণমানের ঘর: অটো মান দেখায়, হাতে লিখলে অটো বন্ধ হয়, "অটো" বাটনে আবার চালু হয়
+          const fa = (k, l, flag) => `<div><label>${l} <small id=st_${k} class=mu>${cur[flag] ? "(অটো)" : "(নিজে বদলানো)"}</small></label><div class=fl><input class=s id=f_${k} value="${esc(cur[k])}" oninput="cur.${k}=this.value;cur.${flag}=false;syncAuto()"><button class=sm onclick="autoOn('${flag}')">অটো</button></div></div>`;
+          // সেটের তথ্যের ফর্ম ও সেভ/প্রিভিউ বাটন, তার পর ব্যাংক থেকে বাছাই ও নির্বাচিত তালিকা (দুই কলাম)
+          return `<div class=card><div class=two>${f("org", "প্রতিষ্ঠানের নাম (শিরোনাম)")}${f("code", "সেট কোড")}${f("name", "সেটের নাম")}${f("exam", "পরীক্ষার নাম")}${f("date", "তারিখ")}${fa("time", "সময়", "autoT")}${fa("marks", "পূর্ণমান", "autoM")}${f("scode", "বিষয় কোড")}${f("sub", "শিরোনামের নিচের লাইন")}<div style="grid-column:1/-1"><label>বিশেষ দ্রষ্টব্য</label><textarea rows=3 oninput="cur.note=this.value">${esc(O("note"))}</textarea></div></div><div class=fl style="margin-top:10px"><button class=pr onclick="saveSet()">সেভ করো</button><button onclick="prev()">প্রিভিউ / প্রিন্ট</button></div></div>
+<div class=two><div><h3>ব্যাংক থেকে বাছো</h3>${fbar()}<div class=fl style="margin:6px 0"><select id=rc>${chOpts("")}</select><input id=rn type=number min=1 value=3 style="width:70px"><button class=sm onclick="rnd()">র‍্যান্ডম যোগ</button></div><div id=lst style="max-height:60vh;overflow:auto">${lst()}</div></div><div><h3>নির্বাচিত</h3><div id=sel>${selH()}</div></div></div>`;
+        }
+
+        // প্রিভিউ / প্রিন্ট পাতা
+        function vP() {
+          // ২৫টি প্রশ্ন আছে এবং ওভারফ্লো নেই কিনা (এই মান এখন কোথাও ব্যবহার হয় না)
+          const ok = cnt() == 25 && last && !last.over;
+          // প্রিভিউর নিয়ন্ত্রণ বাটন (ধরন, কলাম, শাফল, ফন্ট, প্রিন্ট) ও পাতার জায়গা
+          return `<div class="no-print card"><div class=fl><button onclick="view='set';draw()">← ফিরে যাও</button>${[["q", "শুধু প্রশ্ন"], ["a", "প্রশ্ন ও উত্তরসহ"], ["b", "দুটোই"]].map((x) => `<button class="${ver == x[0] ? "on" : ""}" onclick="ver='${x[0]}';rp()">${x[1]}</button>`).join("")}<label style="margin:0"><input type=checkbox ${cur.bt ? "checked" : ""} onchange="cur.bt=this.checked;prev()"> বোর্ড ট্যাগ প্রিন্টে</label><button class="${(cur.cc || 3) == 2 ? "on" : ""}" onclick="cur.cc=2;prev()">২ কলাম</button><button class="${(cur.cc || 3) == 3 ? "on" : ""}" onclick="cur.cc=3;prev()">৩ কলাম</button><button onclick="shuf()">🔀 শাফল</button><button onclick="fz(-.5)">A− ফন্ট কমাও</button><button onclick="fz(.5)">A+ ফন্ট বাড়াও</button><button onclick="cur.fs=null;prev()">অটো</button><button class=pr id=pb onclick="window.print()">Print / PDF</button><span id=inf class=mu></span></div><small class=mu>↕ প্রশ্ন টেনে অন্য প্রশ্নের ওপর ছেড়ে দিলে ক্রম বদলাবে। প্রিন্ট বন্ধ থাকলে পাতাটি আলাদা ট্যাবে খুলে চেষ্টা করো।</small></div><div id=print></div>`;
+        }
+
+        // বর্তমান ভিউ অনুযায়ী পুরো পাতা আঁকে
+        function draw() {
+          // প্রিভিউ ভিউ কিনা এবং প্রিন্টে বোর্ড ট্যাগ লাগবে কিনা ঠিক করে
+          LM = view == "prev";
+          PT = LM && !!cur.bt;
+          // নেভিগেশনসহ নির্বাচিত ভিউয়ের HTML বসায়
+          $("#app").innerHTML = nav() + "<div class=wrap>" + { dash: vD, ch: vC, src: vR, sets: vL, bank: vB, set: vS, prev: vP }[view]() + "</div>";
+          // প্রশ্ন এডিট চললে ডুপ্লিকেট-চেক প্যানেল আঁকে
+          if (view == "bank" && ed) sim();
+        }
+
+        // ---------- অ্যাকশন (বাটনের কাজ) ----------
+        // নতুন অধ্যায় যোগ করে
+        async function addCh() {
+          const n = +$("#cn").value;
+          const m = $("#cm").value.trim();
+          if (!m) return alert("নাম লেখো");
+          const id = uid();
+          const r = await sb.from("chapters").insert({ id, num: n, name: m });
+          if (r.error) return alert(r.error.message);
+          S.ch.push({ id, n, name: m });
+          draw();
+        }
+
+        // অধ্যায়ের নাম ও নম্বর এডিট করে
+        async function editCh(id) {
+          const c = S.ch.find((x) => x.id == id);
+          const m = prompt("অধ্যায়ের নাম", c.name);
+          if (m === null) return;
+          const n = prompt("অধ্যায় নম্বর", c.n);
+          const nn = +n || c.n;
+          const r = await sb.from("chapters").update({ name: m, num: nn }).eq("id", id);
+          if (r.error) return alert(r.error.message);
+          c.name = m;
+          c.n = nn;
+          draw();
+        }
+
+        // অধ্যায় (ও তার সব প্রশ্ন) ডিলিট করে
+        async function delCh(id) {
+          if (!confirm("এই অধ্যায়ের সব প্রশ্নও মুছে যাবে। ডিলিট করবে?")) return;
+          const r = await sb.from("chapters").delete().eq("id", id);
+          if (r.error) return alert(r.error.message);
+          await load();
+          draw();
+        }
+
+        // নতুন প্রশ্নের এডিটর খোলে (অধ্যায় না থাকলে আগে অধ্যায় বানাতে বলে)
+        function newQuestion() {
+          if (!S.ch.length) {
+            alert("প্রথমে একটি অধ্যায় তৈরি করো");
+            return go("ch");
+          }
+          ed = newQ();
+          view = "bank";
+          draw();
+        }
+
+        // বিদ্যমান প্রশ্নের কপি এডিটরে খোলে
+        function editQ(id) {
+          ed = JSON.parse(JSON.stringify(S.q.find((q) => q.id == id)));
+          draw();
+        }
+
+        // প্রশ্ন ডিলিট করে
+        async function delQ(id) {
+          if (!confirm("প্রশ্নটি ডিলিট করবে?")) return;
+          const r = await sb.from("questions").delete().eq("id", id);
+          if (r.error) return alert(r.error.message);
+          S.q = S.q.filter((q) => q.id != id);
+          S.sets.forEach((s) => s.ids = s.ids.filter((i) => i != id));
+          draw();
+        }
+
+        // প্রশ্ন যাচাই করে ডেটাবেসে সেভ করে
+        async function saveQ() {
+          const q = ed;
+          const subs = q.type == "group" ? q.kids : [q];
+          // অধ্যায় বাছাই হয়েছে কিনা দেখে
+          if (!q.ch) return alert("অধ্যায় বাছো");
+          // উদ্দীপকের অন্তত একটি অংশ আছে কিনা দেখে
+          if (q.type == "group" && !(q.stem.ut !== false && q.stem.text.trim() || q.stem.uc !== false && q.stem.code.trim() || q.stem.ui !== false && q.stem.img)) return alert("উদ্দীপকের অন্তত একটি অংশ লেখো ও টিক দাও");
+          // প্রতিটি প্রশ্নের লেখা, বিবৃতি, অপশন ও সঠিক উত্তর যাচাই করে
+          for (const o of subs) {
+            if (!(o.text.trim() || o.img)) return alert("প্রশ্ন লেখো");
+            if (o.type == "multi" && o.st.some((s) => !s.trim())) return alert("i, ii, iii সব লেখো");
+            if (o.opts.some((x) => !x.trim())) return alert("চারটি অপশনই লেখো");
+            if (o.ans < 0) return alert("সঠিক উত্তর বাছো");
+          }
+          // বোর্ড ও সাল জোড়ায় আছে কিনা দেখে
+          if ((q.src || []).some((s) => !s.b != !s.y)) return alert("বোর্ড বাছলে সাল বাছো (এবং সাল বাছলে বোর্ড)");
+          // অসম্পূর্ণ ও ডুপ্লিকেট উৎস বাদ দেয়
+          q.src = (q.src || []).filter((s, i, a) => s.b && s.y && a.findIndex((t) => t.b == s.b && t.y == s.y) == i);
+          // ডেটাবেসে সেভ করে (ব্যর্থ হলে সতর্কবার্তা দেয়)
+          try {
+            await persistQ(q);
+          } catch (e) {
+            return alert("সেভ ব্যর্থ: " + e.message);
+          }
+          // তালিকায় থাকলে বদলায়, নাহলে নতুন যোগ করে
+          const i = S.q.findIndex((x) => x.id == q.id);
+          i < 0 ? S.q.push(q) : S.q[i] = q;
+          ed = null;
+          draw();
+        }
+
+        // সব প্রশ্ন Expand/Collapse টগল করে
+        function tgx() {
+          EX = !EX;
+          $("#lst").innerHTML = lst();
+          $("#xb").textContent = EX ? "সব Collapse করো" : "সব Expand করো";
+        }
+
+        // এডিটরের প্রশ্নের সব লেখা একত্র করে (ডুপ্লিকেট খোঁজার জন্য)
+        const qtxt = () => {
+          const o = ed;
+          return (o.type == "group" ? [o.stem.text, o.stem.code, ...o.kids.flatMap((k) => [k.text, ...k.st])] : [o.text, ...o.st]).join(" ");
+        };
+
+        // ডুপ্লিকেট-চেক প্যানেল ও প্রিভিউ আঁকে
+        function sim() {
+          const el = $("#sim");
+          if (!el || !ed) return;
+          sim1(el);
+          el.insertAdjacentHTML("afterbegin", "<details open><summary><b>👁 প্রিভিউ</b></summary><div class=pv>" + blk(ed, 1, 1) + "</div></details><hr>");
+        }
+
+        // নতুন প্রশ্নের শব্দের সাথে ব্যাংকের প্রশ্ন মিলিয়ে মিল খোঁজে
+        function sim1(el) {
+          // লেখাকে শব্দে ভাঙে
+          const tk = [...new Set(qtxt().toLowerCase().split(/[\s,.;:?!()\[\]{}"'।—\-]+/).filter((x) => x.length > 1))];
+          // শব্দ কম হলে নির্দেশনা দেখায়
+          if (tk.length < 2) {
+            el.innerHTML = "<b>🔎 আগে থেকে আছে কি?</b><p class=mu>প্রশ্ন লিখতে শুরু করলে এখানে ব্যাংকের মিলে যাওয়া প্রশ্ন দেখাবে।</p>";
+            return;
+          }
+          // অন্তত ৫০% শব্দ মিললে সর্বোচ্চ ৮টি প্রশ্ন বাছে
+          const r = S.q.filter((q) => q.id != ed.id).map((q) => {
+            const h = hay(q);
+            return { q, s: tk.filter((t) => h.includes(t)).length / tk.length };
+          }).filter((x) => x.s >= 0.5).sort((a, b) => b.s - a.s).slice(0, 8);
+          // মিলের ফলাফল (সতর্কতা / মিল আছে / নতুন) ও প্রশ্নের তালিকা দেখায়
+          el.innerHTML = (r.length ? r[0].s >= 0.8 ? '<b style="color:#d92d20">⚠ খুব মিল আছে, সম্ভবত আগে থেকেই ব্যাংকে আছে</b>' : "<b>🔎 মিল আছে (" + bn(r.length) + " টি)</b>" : '<b style="color:#12b76a">✅ আগে নেই, নতুন মনে হচ্ছে</b>') + r.map((x) => `<div class=card style="padding:6px 8px"><span class=chip>${bn(Math.round(x.s * 100))}% মিল</span> <span class=chip>${TY[x.q.type]}</span><details><summary>${smh(x.q)}<br><small>${esc(chn(x.q.ch))}${tag(x.q) ? " • " + esc(tag(x.q)) : ""}</small></summary><div class=pv>${blk(x.q, 1, 1)}</div></details><button class=sm onclick="simEdit('${x.q.id}')">এডিট</button></div>`).join("");
+        }
+
+        // মিলে যাওয়া প্রশ্ন এডিটে নেয় (না-সেভ লেখা হারানোর আগে নিশ্চিত করে)
+        function simEdit(id) {
+          if (qtxt().trim() && !confirm("এখন যা লিখেছ তা সেভ না করলে হারিয়ে যাবে। ওই প্রশ্ন এডিট করবে?")) return;
+          editQ(id);
+          scrollTo(0, 0);
+        }
+
+        // প্রশ্নের অপশন কয় কলামে সাজানো যাবে তা মেপে ঠিক করে
+        function ml(o, t, W) {
+          // মাপার জন্য লুকানো span
+          const p = document.createElement("span");
+          p.style.cssText = "position:absolute;white-space:nowrap;visibility:hidden";
+          t.append(p);
+          // একটি HTML-এর প্রস্থ মাপে
+          const w = (h) => {
+            p.innerHTML = h;
+            return p.offsetWidth;
+          };
+          // কলামের মাঝের ফাঁক (px)
+          const g = 7.56;
+          // সবচেয়ে চওড়া অপশনের প্রস্থ
+          const mx = Math.max(...o.opts.map((x, i) => w(optH(o, i, 1))));
+          // ৪, ২ বা ১ কলাম ঠিক করে
+          const r = { o: mx <= (W - 3 * g) / 4 ? "l4" : mx <= (W - g) / 2 ? "l2" : "l1" };
+          // multi প্রশ্নে বিবৃতিগুলো এক লাইনে ধরে কিনা দেখে
+          if (o.type == "multi") r.s = o.st.map((s, i) => w(["i", "ii", "iii"][i] + ". " + rt(s, MX))).reduce((a, b) => a + b, 0) + 2 * g <= W - 8;
+          // মাপার span সরায়
+          p.remove();
+          return r;
+        }
+
+        // সেটের প্রশ্নের ক্রম এলোমেলো করে (Fisher–Yates শাফল)
+        function shuf() {
+          const a = cur.ids;
+          for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+          }
+          const y = scrollY;
+          prev().then(() => scrollTo(0, y));
+        }
+
+        // এডিটরের প্রশ্নের LaTeX সাধারণ লেখায় বদলায়
+        function cleanAll() {
+          const f = (o) => {
+            o.text = ltx2txt(o.text);
+            o.st = o.st.map((x) => ltx2txt(x));
+            o.opts = o.opts.map((x) => ltx2txt(x));
+          };
+          f(ed);
+          ed.kids.forEach(f);
+          ed.stem.text = ltx2txt(ed.stem.text);
+          draw();
+        }
+
+        // multi প্রশ্নের অপশন ডিফল্টে ফেরায়
+        function dflt(p) {
+          setp(ed, p + "opts", [...MD]);
+          draw();
+        }
+
+        // কার্সার যেখানে আছে সেখানে চিহ্ন বসায় (প্যালেটের বাটন)
+        function ins(c) {
+          const e = lf;
+          if (!e) return;
+          e.setRangeText(c, e.selectionStart, e.selectionEnd, "end");
+          e.dispatchEvent(new Event("input", { bubbles: true }));
+          if (c == "~{}") e.setSelectionRange(e.selectionEnd - 1, e.selectionEnd - 1);
+        }
+
+        // ফাইল ইনপুট থেকে ছবি নেয়
+        function upl(inp, k) {
+          imgFile(inp.files[0], k);
+        }
+
+        // pk = ছবি পেস্টের লক্ষ্য ঘর
+        let pk = null;
+
+        // ছবি ছোট (সর্বোচ্চ ৭০০px) করে JPEG ডেটা URL বানায়
+        function imgFile(f, k) {
+          if (!f || !/^image/.test(f.type)) return;
+          const r = new FileReader();
+          r.onload = () => {
+            const im = new Image();
+            im.onload = () => {
+              const s = Math.min(1, 700 / im.width);
+              const c = document.createElement("canvas");
+              c.width = im.width * s;
+              c.height = im.height * s;
+              c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+              setp(ed, k, c.toDataURL("image/jpeg", 0.75));
+              draw();
+            };
+            im.src = r.result;
+          };
+          r.readAsDataURL(f);
+        }
+
+        // ইভেন্ট ফোকাস: সর্বশেষ ইনপুট ও ছবির লক্ষ্য মনে রাখে
+        document.addEventListener("focusin", (e) => {
+          const t = e.target;
+          if (/INPUT|TEXTAREA/.test(t.tagName) && t.type != "file" && t.type != "checkbox" && t.type != "radio") {
+            lf = t;
+            const k = t.dataset.k;
+            if (k && ed) pk = k.startsWith("stem.") ? "stem.img" : (k.match(/^kids\.\d+\./) || [""])[0] + "img";
+          }
+        });
+
+        // ইভেন্ট পেস্ট: LaTeX হলে সাধারণ লেখায় বদলায়, ছবি হলে ছবির ঘরে বসায়
+        document.addEventListener("paste", (e) => {
+          if (!ed) return;
+          const tx = e.clipboardData ? e.clipboardData.getData("text") : "";
+          const t = e.target;
+          if (tx && !ed.mx && /\$|\\[a-zA-Z]/.test(tx) && t.dataset && t.dataset.k && /INPUT|TEXTAREA/.test(t.tagName)) {
+            e.preventDefault();
+            t.setRangeText(ltx2txt(tx), t.selectionStart, t.selectionEnd, "end");
+            t.dispatchEvent(new Event("input", { bubbles: true }));
+            return;
+          }
+          const it = [...e.clipboardData ? e.clipboardData.items : []].find((x) => x.type.startsWith("image"));
+          if (!it) return;
+          e.preventDefault();
+          let k = pk || "img";
+          if (ed.type == "group" && k == "img") k = "stem.img";
+          imgFile(it.getAsFile(), k);
+        });
+
+        // ইভেন্ট ইনপুট: এডিটরের মান আপডেট করে ও প্রিভিউ নবায়ন করে
+        document.addEventListener("input", (e) => {
+          const k = e.target.dataset && e.target.dataset.k;
+          if (!k || !ed) return;
+          let v = e.target.type == "checkbox" ? e.target.checked : e.target.value;
+          if (/ans$/.test(k)) v = +v;
+          setp(ed, k, v);
+          if (/(text|code|st\.\d|opts\.\d|ans|mx)$/.test(k)) sim();
+        });
+
+        // ইভেন্ট পরিবর্তন: বোর্ড/সাল/টাইপ বদলালে এডিটর নতুন করে আঁকে
+        document.addEventListener("change", (e) => {
+          const k = e.target.dataset && e.target.dataset.k;
+          if (k && ed && /^src\.\d+\.[by]$/.test(k)) {
+            draw();
+            return;
+          }
+          if (!k || !ed || !/type$/.test(k)) return;
+          // টাইপ বদলালে অপশনের ডিফল্ট ঠিক করে
+          if (k.endsWith("type")) {
+            const p = k.slice(0, -4);
+            const o = p ? ed.kids[+p.split(".")[1]] : ed;
+            const emp = o.opts.every((x) => !x.trim());
+            const isd = o.opts.join() == MD.join();
+            if (o.type == "multi" && emp) o.opts = [...MD];
+            if (o.type != "multi" && isd) o.opts = ["", "", "", ""];
+          }
+          draw();
+        });
+
+        // ---------- সেট ----------
+        // পরবর্তী সেট কোড বানায় (ZIC-001, ZIC-002 ...)
+        const nc = () => {
+          const m = Math.max(0, ...S.sets.map((s) => +((s.code || "").match(/(\d+)$/) || [0, 0])[1]));
+          return "ZIC-" + String(m + 1).padStart(3, "0");
+        };
+
+        // নতুন ফাঁকা সেট খোলে
+        function newSet() {
+          cur = { id: uid(), code: nc(), name: "", exam: "মডেল টেস্ট", date: "", time: "", marks: "", autoT: true, autoM: true, ids: [], org: DEF_ORG, sub: DEF_SUB, scode: "২৯৫", note: DEF_NOTE };
+          go("set");
+        }
+
+        // সেভ করা সেট খোলে (ফাঁকা ঘরে ডিফল্ট মান বসায়)
+        const openSet = (id) => {
+          cur = JSON.parse(JSON.stringify(S.sets.find((s) => s.id == id)));
+          cur.code = cur.code || nc();
+          cur.org = cur.org ?? DEF_ORG;
+          cur.sub = cur.sub ?? DEF_SUB;
+          cur.scode = cur.scode ?? "২৯৫";
+          cur.note = cur.note ?? DEF_NOTE;
+          // সেভ করা সময়/পূর্ণমান অটো মানের সমান হলে অটো চালু, নইলে নিজে বদলানো ধরে রাখে
+          cur.autoT = cur.time == autoTime();
+          cur.autoM = cur.marks == autoMark();
+          go("set");
+        };
+
+        // সেট ডুপ্লিকেট করে
+        async function dupSet(id) {
+          const s = JSON.parse(JSON.stringify(S.sets.find((x) => x.id == id)));
+          s.id = uid();
+          s.code = nc();
+          s.name += " (কপি)";
+          try {
+            await persistSet(s);
+          } catch (e) {
+            return alert("সেভ ব্যর্থ: " + e.message);
+          }
+          S.sets.push(s);
+          draw();
+        }
+
+        // সেট ডিলিট করে
+        async function delSet(id) {
+          if (!confirm("সেট ডিলিট করবে?")) return;
+          const r = await sb.from("sets").delete().eq("id", id);
+          if (r.error) return alert(r.error.message);
+          S.sets = S.sets.filter((s) => s.id != id);
+          draw();
+        }
+
+        // সেট সেভ করে (নাম ও কোড যাচাইসহ)
+        async function saveSet() {
+          if (!cur.name.trim()) return alert("সেটের নাম দাও");
+          cur.code = (cur.code || "").trim() || nc();
+          if (S.sets.some((s) => s.id != cur.id && s.code == cur.code)) return alert("এই সেট কোড অন্য সেটে আছে, আলাদা কোড দাও");
+          const c = JSON.parse(JSON.stringify(cur));
+          try {
+            await persistSet(c);
+          } catch (e) {
+            return alert("সেভ ব্যর্থ: " + e.message);
+          }
+          const i = S.sets.findIndex((x) => x.id == c.id);
+          i < 0 ? S.sets.push(c) : S.sets[i] = c;
+          alert("সেট সেভ হয়েছে");
+        }
+
+        // প্রশ্ন সেটে যোগ বা বাদ দেয়
+        function tog(id, on) {
+          const i = cur.ids.indexOf(id);
+          if (on && i < 0) cur.ids.push(id);
+          if (!on && i >= 0) cur.ids.splice(i, 1);
+          $("#sel").innerHTML = selH();
+          if (!on && view == "set") $("#lst").innerHTML = lst();
+          // প্রশ্ন সংখ্যা বদলেছে, তাই সময় ও পূর্ণমান নবায়ন করে
+          syncAuto();
+        }
+
+        // অটো সময় ও পূর্ণমান: প্রতি প্রশ্নের জন্য ১ মিনিট ও ১ নম্বর ধরা হয়
+        const autoTime = () => bn(cnt()) + " মিনিট";
+        const autoMark = () => bn(cnt());
+
+        // অটো চালু থাকা ঘরের মান বর্তমান প্রশ্ন সংখ্যা অনুযায়ী বদলায় ও ঘরে দেখায়
+        function syncAuto() {
+          if (cur.autoT) cur.time = autoTime();
+          if (cur.autoM) cur.marks = autoMark();
+          const t = $("#f_time");
+          const m = $("#f_marks");
+          if (t && t.value != cur.time) t.value = cur.time;
+          if (m && m.value != cur.marks) m.value = cur.marks;
+          const st = $("#st_time");
+          const sk = $("#st_marks");
+          if (st) st.textContent = cur.autoT ? "(অটো)" : "(নিজে বদলানো)";
+          if (sk) sk.textContent = cur.autoM ? "(অটো)" : "(নিজে বদলানো)";
+        }
+
+        // "অটো" বাটন: হাতে বদলানো মান বাদ দিয়ে আবার স্বয়ংক্রিয় করে
+        function autoOn(flag) {
+          cur[flag] = true;
+          syncAuto();
+        }
+
+        // সেটে প্রশ্নের ক্রম ওপর-নিচ করে
+        function mv(i, d) {
+          const j = i + d;
+          if (j < 0 || j >= cur.ids.length) return;
+          [cur.ids[i], cur.ids[j]] = [cur.ids[j], cur.ids[i]];
+          $("#sel").innerHTML = selH();
+        }
+
+        // নির্বাচিত অধ্যায় থেকে র‍্যান্ডম প্রশ্ন যোগ করে
+        function rnd() {
+          const c = $("#rc").value;
+          const n = +$("#rn").value;
+          if (!c) return alert("অধ্যায় বাছো");
+          const pool = S.q.filter((q) => q.ch == c && !cur.ids.includes(q.id)).sort(() => Math.random() - 0.5);
+          let a = 0;
+          for (const q of pool) {
+            if (a >= n) continue;
+            cur.ids.push(q.id);
+            a += units(q);
+          }
+          draw();
+        }
+
+        // প্রিভিউ খোলে ও লেআউট হিসাব করে
+        async function prev() {
+          view = "prev";
+          draw();
+          last = await lay();
+          rp();
+        }
+
+        // প্রিভিউ আবার আঁকে
+        function rp() {
+          draw0();
+        }
+
+        // ফন্ট সাইজ বাড়ায় বা কমায় (৬–১৬pt)
+        function fz(d) {
+          cur.fs = Math.max(6, Math.min(16, (cur.fs || last.f) + d));
+          prev();
+        }
+
+        // হিসাব করা লেআউট অনুযায়ী প্রিভিউ পাতা আঁকে
+        function draw0() {
+          if (!last) return;
+          const pc = Math.ceil(last.cols.length / last.C);
+          $("#print").innerHTML = ver == "b" ? pages(last, 0) + pages(last, 1) : pages(last, ver == "a" ? 1 : 0);
+          document.querySelectorAll(".nav button").forEach((b) => b.blur());
+          const i = $("#inf");
+          if (i) i.textContent = `${bn(pc)} পেজ, ফন্ট ${bn(last.f)}pt${cur.fs ? " (ম্যানুয়াল)" : " (অটো)"}${last.over ? " ⚠ প্রশ্ন বেশি লম্বা, ছবি/উদ্দীপক কমাও" : ""}`;
+          document.querySelectorAll(".no-print .fl button").forEach((b) => {
+            if (["q", "a", "b"].some((v) => b.getAttribute("onclick") == "ver='" + v + "';rp()")) b.classList.toggle("on", b.getAttribute("onclick") == "ver='" + ver + "';rp()");
+          });
+        }
+
+        // ---------- টেনে ক্রম বদল (ড্র্যাগ) ----------
+        // dg = যে প্রশ্নটি টানা হচ্ছে তার সূচক
+        let dg = null;
+
+        // সবচেয়ে কাছের টানার যোগ্য প্রশ্ন খুঁজে বের করে
+        const cd = (e) => e.target.closest ? e.target.closest(".di") : null;
+
+        // টানা শুরু হলে প্রশ্নের সূচক মনে রাখে
+        document.addEventListener("dragstart", (e) => {
+          const d = cd(e);
+          if (d) {
+            dg = +d.dataset.i;
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", "q");
+          }
+        });
+
+        // টানার সময় লক্ষ্য প্রশ্ন হাইলাইট করে
+        document.addEventListener("dragover", (e) => {
+          const d = cd(e);
+          if (d && dg != null) {
+            e.preventDefault();
+            document.querySelectorAll(".di.ov").forEach((x) => x.classList.remove("ov"));
+            d.classList.add("ov");
+          }
+        });
+
+        // ছেড়ে দিলে প্রশ্নের ক্রম বদলে পুনরায় আঁকে
+        document.addEventListener("drop", (e) => {
+          const d = cd(e);
+          if (!d || dg == null) return;
+          e.preventDefault();
+          const j = +d.dataset.i;
+          const i = dg;
+          dg = null;
+          if (i == j) return;
+          const U = last.U;
+          const a = cur.ids.indexOf(U[i].q.id);
+          const b = cur.ids.indexOf(U[j].q.id);
+          cur.ids.splice(b, 0, cur.ids.splice(a, 1)[0]);
+          const y = scrollY;
+          prev().then(() => scrollTo(0, y));
+        });
+
+        // টানা শেষ হলে হাইলাইট সরায়
+        document.addEventListener("dragend", () => {
+          dg = null;
+          document.querySelectorAll(".di.ov").forEach((x) => x.classList.remove("ov"));
+        });
+
+        // ---------- ব্যাকআপ ----------
+        // সব ডেটা JSON হিসেবে Export করে ও ক্লিপবোর্ডে কপি করে
+        function exp() {
+          const t = JSON.stringify(S);
+          $("#bk").value = t;
+          $("#bk").select();
+          try {
+            navigator.clipboard.writeText(t);
+          } catch (e) {
+          }
+        }
+
+        // JSON ব্যাকআপ ডেটাবেসে Import করে
+        async function imp() {
+          // টেক্সটবক্সের JSON পড়ে সঠিক কিনা যাচাই করে
+          let d;
+          try {
+            d = JSON.parse($("#bk").value);
+            if (!d.ch || !d.q) throw 0;
+          } catch (e) {
+            return alert("সঠিক JSON নয়");
+          }
+          // ব্যবহারকারীর নিশ্চিতকরণ চায়
+          if (!confirm('এই JSON-এর সব অধ্যায়, প্রশ্ন ও সেট ডেটাবেসে যোগ হবে (বর্তমান ডেটা থাকবে)। পুরোনো "বোর্ড" লেখা থেকে বোর্ড ও সাল নিজে থেকে তৈরি হবে। একই JSON দুবার দিলে ডুপ্লিকেট হবে। চালিয়ে যাবে?')) return;
+          // m = পুরোনো আইডি → নতুন আইডি মানচিত্র
+          const m = {};
+          // নতুন আইডি দেয় (একই পুরোনো আইডিতে একই নতুন আইডি)
+          const nid = (o) => m[o] = m[o] || uid();
+          // ইমপোর্টের অগ্রগতি দেখায়
+          const ip = (t) => {
+            const e = $("#ip");
+            if (e) e.textContent = t;
+          };
+          // codes = বিদ্যমান সেট কোড (ডুপ্লিকেট এড়াতে)
+          const codes = new Set(S.sets.map((x) => x.code));
+          // bad = বোঝা যায়নি এমন বোর্ড লেখা
+          const bad = new Set();
+          // bm ও ym = বোর্ড ও সালের পুরোনো → নতুন আইডি
+          const bm = {};
+          const ym = {};
+          try {
+            // অধ্যায় Import করে
+            for (const c of d.ch) {
+              const r = await sb.from("chapters").upsert({ id: nid(c.id), num: c.n, name: c.name });
+              if (r.error) throw r.error;
+            }
+            // বোর্ড Import করে
+            for (const b of d.boards || []) bm[b.id] = await ensB(b.name, b.sn || b.shortname);
+            // সাল Import করে
+            for (const y of d.years || []) ym[y.id] = await ensY(y.y || y.year, y.sy || y.shortyear);
+            // প্রশ্ন Import শুরু (n = গণনা)
+            let n = 0;
+            for (const q of d.q) {
+              // প্রশ্ন ও উপপ্রশ্নের নতুন আইডি বসায়
+              q.id = nid(q.id);
+              q.ch = nid(q.ch);
+              (q.kids || []).forEach((k) => k.id = uid());
+              // প্রশ্নের উৎস (বোর্ড ও সাল) তৈরি করে
+              let src = [];
+              // নতুন ধরনের src তালিকা থেকে
+              if (Array.isArray(q.src)) src = q.src.filter((x) => bm[x.b] && ym[x.y]).map((x) => ({ b: bm[x.b], y: ym[x.y] }));
+              // পুরোনো "board" লেখা থেকে বোর্ড ও সাল বের করে
+              else if (q.board) {
+                const tk = String(q.board).split(",");
+                const ps = pbs(q.board);
+                for (let i = 0; i < ps.length; i++) {
+                  const p = ps[i];
+                  if (!p) {
+                    if (tk[i].trim()) bad.add(tk[i].trim());
+                    continue;
+                  }
+                  const yy = p.d.length <= 2 ? (/[০-৯]/.test(p.d) ? "২০" : "20") + p.d : p.d;
+                  src.push({ b: await ensB(p.a, p.a + ": বো:"), y: await ensY(yy, p.d) });
+                }
+              }
+              // প্রশ্ন ডেটাবেসে সেভ করে ও অগ্রগতি দেখায়
+              q.src = src;
+              delete q.board;
+              await persistQ(q);
+              ip("প্রশ্ন " + bn(++n) + "/" + bn(d.q.length));
+            }
+            // সেট Import করে (কোড মিলে গেলে আগে IMP- বসায়)
+            for (const s of d.sets || []) {
+              s.id = nid(s.id);
+              s.ids = (s.ids || []).filter((i) => m[i]).map(nid);
+              if (codes.has(s.code)) s.code = "IMP-" + s.code;
+              codes.add(s.code);
+              await persistSet(s);
+            }
+            // নতুন ডেটা লোড করে, পুনরায় আঁকে ও শেষ বার্তা দেখায়
+            await load();
+            draw();
+            alert("ইমপোর্ট শেষ" + (bad.size ? "। এই বোর্ড লেখাগুলো বোঝা যায়নি, হাতে ঠিক করো: " + [...bad].join(" | ") : ""));
+          // ব্যর্থ হলে ত্রুটির বার্তা দেখায়
+          } catch (e) {
+            ip("");
+            alert("ইমপোর্ট ব্যর্থ: " + (e.message || e) + "। কিছু ডেটা ঢুকে থাকতে পারে।");
+          }
+        }
+
+        // ফাইল থেকে JSON পড়ে টেক্সটবক্সে বসায়
+        function fi(i) {
+          const f = i.files[0];
+          if (!f) return;
+          const r = new FileReader();
+          r.onload = () => {
+            $("#bk").value = r.result;
+          };
+          r.readAsText(f);
+        }
+
+        // ---------- বোর্ড ও সাল ----------
+        // বোর্ডের আইডি থেকে সংক্ষিপ্ত নাম
+        const bsn = (id) => {
+          const b = S.boards.find((x) => x.id == id);
+          return b ? b.sn : "";
+        };
+
+        // সালের আইডি থেকে সংক্ষিপ্ত রূপ
+        const ysn = (id) => {
+          const y = S.years.find((x) => x.id == id);
+          return y ? y.sy : "";
+        };
+
+        // প্রশ্নের বোর্ড-সাল ট্যাগ (যেমন ঢা: বো: ’২৫)
+        const tag = (q) => (q.src || []).map((s) => bsn(s.b) + " ’" + ysn(s.y)).join(", ");
+
+        // বাংলা অঙ্ককে ইংরেজি অঙ্কে বদলায় (তুলনার জন্য)
+        const tEn = (s) => String(s).replace(/[০-৯]/g, (c) => "০১২৩৪৫৬৭৮৯".indexOf(c));
+
+        // বোর্ডের সংক্ষিপ্ত নাম থেকে স্পেস, চিহ্ন ও "বো" বাদ দিয়ে তুলনার উপযোগী করে
+        const bnorm = (s) => String(s || "").replace(/[\s:.]/g, "").replace(/বো$/, "");
+
+        // বোর্ড আছে কিনা দেখে, না থাকলে ডেটাবেসে যোগ করে আইডি ফেরত দেয়
+        async function ensB(name, sn) {
+          const k = bnorm(sn);
+          const b = S.boards.find((x) => bnorm(x.sn) == k);
+          if (b) return b.id;
+          const id = uid();
+          const r = await sb.from("boards").insert({ id, name: name || sn, shortname: sn });
+          if (r.error) throw r.error;
+          S.boards.push({ id, name: name || sn, sn });
+          return id;
+        }
+
+        // সাল আছে কিনা দেখে, না থাকলে ডেটাবেসে যোগ করে আইডি ফেরত দেয়
+        async function ensY(y, sy) {
+          const k = tEn(sy);
+          const o = S.years.find((x) => tEn(x.sy) == k);
+          if (o) return o.id;
+          const id = uid();
+          const r = await sb.from("years").insert({ id, year: y, shortyear: sy });
+          if (r.error) throw r.error;
+          S.years.push({ id, y, sy });
+          return id;
+        }
+
+        // "ঢা: বো: ’২৫" ধরনের লেখা থেকে বোর্ড ও সাল আলাদা করে
+        const pbs = (s) => String(s || "").split(",").map((t) => {
+          const m = t.replace(/[‘’'`]/g, "'").match(/^\s*(\S+?)\s*[:.]?\s*বো\s*[:.]?\s*'?\s*([০-৯0-9]+)\s*$/);
+          return m ? { a: m[1], d: m[2] } : null;
+        });
+
+        // প্রশ্নের উৎস বোর্ড ও সালের নির্বাচন অংশের HTML
+        const srcF = (q) => `<label>উৎস বোর্ড ও সাল (ঐচ্ছিক; বোর্ড বাছলে সাল বাধ্যতামূলক)</label>` + (q.src || []).map((s, i) => `<div class=r><select data-k="src.${i}.b">${opt([["", "-- বোর্ড --"], ...S.boards.map((b) => [b.id, b.name])], s.b)}</select><select data-k="src.${i}.y">${opt([["", "-- সাল --"], ...S.years.map((y) => [y.id, y.y])], s.y)}</select><button class=sm onclick="ed.src.splice(${i},1);draw()">✕</button></div>`).join("") + `<button class=sm onclick="ed.src.push({b:'',y:''});draw()">+ বোর্ড যোগ করো</button>${tag(q) ? " <small class=mu>ট্যাগ: [" + esc(tag(q)) + "]</small>" : ""}`;
+
+        // একটি বোর্ডে কয়টি প্রশ্ন আছে
+        const cntB = (id) => S.q.filter((q) => (q.src || []).some((s) => s.b == id)).reduce((a, q) => a + units(q), 0);
+
+        // একটি সালে কয়টি প্রশ্ন আছে
+        const cntY = (id) => S.q.filter((q) => (q.src || []).some((s) => s.y == id)).reduce((a, q) => a + units(q), 0);
+
+        // বোর্ড ও সাল ব্যবস্থাপনার পাতা
+        function vR() {
+          return `<div class=two><div><h3>বোর্ড</h3><div class=card><div class=fl><input id=ib1 class=s placeholder="নাম (ঢাকা)"><input id=ib2 placeholder="সংক্ষিপ্ত (ঢা: বো:)" style="width:140px"><button class=pr onclick="addB()">যোগ</button></div></div>${S.boards.map((b) => `<div class=row><span>${esc(b.name)} <small>(${esc(b.sn)}) • ${bn(cntB(b.id))} প্রশ্ন</small></span><span style="white-space:nowrap"><button class=sm onclick="editB('${b.id}')">এডিট</button> <button class=sm onclick="delB('${b.id}')">ডিলিট</button></span></div>`).join("")}</div><div><h3>সাল</h3><div class=card><div class=fl><input id=iy1 class=s placeholder="সাল (২০২৫)"><input id=iy2 placeholder="সংক্ষিপ্ত (২৫)" style="width:110px"><button class=pr onclick="addY()">যোগ</button></div></div>${S.years.map((y) => `<div class=row><span>${esc(y.y)} <small>(${esc(y.sy)}) • ${bn(cntY(y.id))} প্রশ্ন</small></span><span style="white-space:nowrap"><button class=sm onclick="editY('${y.id}')">এডিট</button> <button class=sm onclick="delY('${y.id}')">ডিলিট</button></span></div>`).join("")}</div></div>`;
+        }
+
+        // সেভ করা সেটের তালিকার পাতা
+        function vL() {
+          // একটি সেটে মোট প্রশ্ন সংখ্যা
+          const q2 = (s) => s.ids.reduce((a, id) => {
+            const q = S.q.find((x) => x.id == id);
+            return a + (q ? units(q) : 0);
+          }, 0);
+          // নতুন সেট বাটন ও কোড অনুযায়ী সাজানো সেটের সারি
+          return `<div class=fl style="justify-content:space-between"><h3 style="margin:0">সেভ করা সেট</h3><button class=pr onclick="newSet()">+ নতুন সেট</button></div>` + (S.sets.length ? [...S.sets].sort((a, b) => String(a.code).localeCompare(String(b.code), undefined, { numeric: true })).map((s) => `<div class=row><span><span class=chip>${esc(s.code || "—")}</span> ${esc(s.name)} <small>• ${bn(q2(s))} টি প্রশ্ন</small></span><span style="white-space:nowrap"><button class=sm onclick="openSet('${s.id}');prev()">প্রিভিউ</button> <button class=sm onclick="openSet('${s.id}')">এডিট</button> <button class=sm onclick="dupSet('${s.id}')">ডুপ্লিকেট</button> <button class=sm onclick="delSet('${s.id}')">ডিলিট</button></span></div>`).join("") : "<p class=mu>এখনো কোনো সেট নেই।</p>");
+        }
+
+        // নতুন বোর্ড যোগ করে
+        async function addB() {
+          const n = $("#ib1").value.trim();
+          const s = $("#ib2").value.trim();
+          if (!n || !s) return alert("নাম ও সংক্ষিপ্ত নাম দুটোই দাও");
+          const id = uid();
+          const r = await sb.from("boards").insert({ id, name: n, shortname: s });
+          if (r.error) return alert(r.error.message);
+          S.boards.push({ id, name: n, sn: s });
+          draw();
+        }
+
+        // বোর্ডের নাম ও সংক্ষিপ্ত নাম এডিট করে
+        async function editB(id) {
+          const b = S.boards.find((x) => x.id == id);
+          const n = prompt("বোর্ডের নাম", b.name);
+          if (n === null) return;
+          const s = prompt("সংক্ষিপ্ত নাম", b.sn);
+          if (s === null) return;
+          const r = await sb.from("boards").update({ name: n, shortname: s }).eq("id", id);
+          if (r.error) return alert(r.error.message);
+          b.name = n;
+          b.sn = s;
+          draw();
+        }
+
+        // বোর্ড ডিলিট করে (প্রশ্নে ব্যবহার হলে আটকায়)
+        async function delB(id) {
+          if (cntB(id)) return alert("এই বোর্ড প্রশ্নে ব্যবহার হচ্ছে, আগে সেখান থেকে সরাও");
+          if (!confirm("বোর্ড ডিলিট করবে?")) return;
+          const r = await sb.from("boards").delete().eq("id", id);
+          if (r.error) return alert(r.error.message);
+          S.boards = S.boards.filter((b) => b.id != id);
+          draw();
+        }
+
+        // নতুন সাল যোগ করে
+        async function addY() {
+          const n = $("#iy1").value.trim();
+          const s = $("#iy2").value.trim();
+          if (!n || !s) return alert("সাল ও সংক্ষিপ্ত রূপ দুটোই দাও");
+          const id = uid();
+          const r = await sb.from("years").insert({ id, year: n, shortyear: s });
+          if (r.error) return alert(r.error.message);
+          S.years.push({ id, y: n, sy: s });
+          S.years.sort((a, b) => String(b.y).localeCompare(String(a.y)));
+          draw();
+        }
+
+        // সালের নাম ও সংক্ষিপ্ত রূপ এডিট করে
+        async function editY(id) {
+          const y = S.years.find((x) => x.id == id);
+          const n = prompt("সাল", y.y);
+          if (n === null) return;
+          const s = prompt("সংক্ষিপ্ত রূপ", y.sy);
+          if (s === null) return;
+          const r = await sb.from("years").update({ year: n, shortyear: s }).eq("id", id);
+          if (r.error) return alert(r.error.message);
+          y.y = n;
+          y.sy = s;
+          draw();
+        }
+
+        // সাল ডিলিট করে (প্রশ্নে ব্যবহার হলে আটকায়)
+        async function delY(id) {
+          if (cntY(id)) return alert("এই সাল প্রশ্নে ব্যবহার হচ্ছে, আগে সেখান থেকে সরাও");
+          if (!confirm("সাল ডিলিট করবে?")) return;
+          const r = await sb.from("years").delete().eq("id", id);
+          if (r.error) return alert(r.error.message);
+          S.years = S.years.filter((y) => y.id != id);
+          draw();
+        }
+
+        // ---------- Supabase (ডেটাবেস) ----------
+        // Supabase-এর URL ও কী (ফাঁকা থাকলে লগইনের আগে ইনপুট নেয়)
+        const SB_URL = "";
+        const SB_KEY = "";
+
+        // sb = Supabase ক্লায়েন্ট
+        let sb = null;
+
+        // সংযোগের তথ্য নেয় (কোডের মান, নাহলে localStorage থেকে)
+        const cfg = () => ({ u: SB_URL || localStorage.getItem("zic_u") || "", k: SB_KEY || localStorage.getItem("zic_k") || "" });
+
+        // ছবি রাখার স্টোরেজ বাকেটের নাম
+        const BK = "question-images";
+
+        // একটি টেবিলের সব সারি ১০০০টি করে ভাগে ভাগে আনে
+        async function all(t) {
+          let a = [];
+          let f = 0;
+          for (; ; ) {
+            const r = await sb.from(t).select("*").order("id").range(f, f + 999);
+            if (r.error) throw r.error;
+            a = a.concat(r.data);
+            if (r.data.length < 1000) return a;
+            f += 1000;
+          }
+        }
+
+        // ডেটাবেসের সারি → উপপ্রশ্নের অবজেক্ট
+        const r2s = (r) => ({ id: r.id, type: r.type, text: r.qtext || "", img: r.img || "", st: r.statements && r.statements.length ? r.statements : ["", "", ""], opts: r.options && r.options.length ? r.options : ["", "", "", ""], ans: r.answer == null ? -1 : r.answer });
+
+        // ডেটাবেসের সারি → পূর্ণ প্রশ্নের অবজেক্ট
+        const q2o = (r, k) => ({ ...r2s(r), ch: r.chapter_id, src: (SRC[r.id] || []).slice(), note: r.note || "", mx: !!r.math, stem: r.stem || { pre: PRE[0], text: "", code: "", img: "" }, kids: k.length ? k.map(r2s) : [ns()] });
+
+        // প্রশ্নের অবজেক্ট → ডেটাবেসের সারি
+        const o2r = (o, q, par, pos) => ({ id: o.id, chapter_id: q.ch, parent_id: par, pos, type: o.type, qtext: o.text || "", img: o.img || null, statements: o.st || [], options: o.opts || [], answer: o.type != "group" && o.ans >= 0 ? o.ans : null, math: !!q.mx, note: q.note || "", stem: o.type == "group" ? q.stem : null });
+
+        // ডেটাবেস থেকে সব ডেটা লোড করে S-এ বসায়
+        async function load() {
+          // সাতটি টেবিলের ডেটা একসাথে আনে
+          const [c, q, s, it, bd, yr, qs] = await Promise.all([all("chapters"), all("questions"), all("sets"), all("set_items"), all("boards"), all("years"), all("question_sources")]);
+          // বোর্ড (নাম অনুযায়ী) ও সাল (নতুন আগে) সাজিয়ে বসায়
+          S.boards = bd.map((x) => ({ id: x.id, name: x.name, sn: x.shortname })).sort((a, b) => a.name.localeCompare(b.name, "bn"));
+          S.years = yr.map((x) => ({ id: x.id, y: x.year, sy: x.shortyear })).sort((a, b) => String(b.y).localeCompare(String(a.y)));
+          // প্রশ্নের উৎস মানচিত্র তৈরি করে
+          SRC = {};
+          qs.sort((a, b) => a.id - b.id).forEach((x) => (SRC[x.question_id] = SRC[x.question_id] || []).push({ b: x.board_id, y: x.year_id }));
+          // অধ্যায় বসায়
+          S.ch = c.map((x) => ({ id: x.id, n: x.num, name: x.name }));
+          // প্রশ্নগুলো তৈরির সময় অনুযায়ী সাজায়
+          q.sort((a, b) => a.created_at < b.created_at ? -1 : a.created_at > b.created_at ? 1 : 0);
+          // উদ্দীপকের উপপ্রশ্নগুলো মূল প্রশ্নের সাথে জোড়া দেয়
+          const kids = {};
+          q.filter((x) => x.parent_id).forEach((x) => (kids[x.parent_id] = kids[x.parent_id] || []).push(x));
+          // মূল প্রশ্নগুলো অবজেক্টে বদলায়
+          S.q = q.filter((x) => !x.parent_id).map((x) => q2o(x, (kids[x.id] || []).sort((a, b) => a.pos - b.pos)));
+          // সেটের প্রশ্নের তালিকা (পজিশন অনুযায়ী) বানায়
+          const m = {};
+          it.sort((a, b) => a.pos - b.pos).forEach((x) => (m[x.set_id] = m[x.set_id] || []).push(x.question_id));
+          // সেটগুলো বসায়
+          S.sets = s.map((x) => ({ id: x.id, code: x.code, name: x.name, exam: x.exam, date: x.exam_date, time: x.exam_time, marks: x.marks, bt: x.board_tag, fs: x.font_size == null ? null : +x.font_size, org: (x.meta || {}).org, sub: (x.meta || {}).sub, scode: (x.meta || {}).scode, note: (x.meta || {}).note, cc: (x.meta || {}).cc, ids: m[x.id] || [] }));
+        }
+
+        // ছবি ডেটা URL হলে Storage-এ আপলোড করে পাবলিক URL ফেরত দেয়
+        async function upImg(u) {
+          if (!u || !u.startsWith("data:")) return u;
+          const b = await (await fetch(u)).blob();
+          const p = uid() + ".jpg";
+          const r = await sb.storage.from(BK).upload(p, b, { contentType: "image/jpeg" });
+          if (r.error) throw r.error;
+          return sb.storage.from(BK).getPublicUrl(p).data.publicUrl;
+        }
+
+        // প্রশ্ন (ও উপপ্রশ্ন, উৎস) ডেটাবেসে সেভ করে
+        async function persistQ(q) {
+          // ছবিগুলো আপলোড করে
+          q.img = await upImg(q.img);
+          q.stem.img = await upImg(q.stem.img);
+          for (const k of q.kids) k.img = await upImg(k.img);
+          // g = উদ্দীপক কিনা
+          const g = q.type == "group";
+          // ডেটাবেসের সারিগুলো প্রস্তুত করে
+          const rows = [o2r(q, q, null, 0)];
+          if (g) q.kids.forEach((k, i) => {
+            k.id = k.id || uid();
+            rows.push(o2r(k, q, q.id, i + 1));
+          });
+          // প্রশ্ন সেভ বা আপডেট করে
+          let r = await sb.from("questions").upsert(rows);
+          if (r.error) throw r.error;
+          // বাদ পড়া উপপ্রশ্ন মুছে ফেলে
+          r = g ? await sb.from("questions").delete().eq("parent_id", q.id).not("id", "in", "(" + q.kids.map((k) => k.id).join(",") + ")") : await sb.from("questions").delete().eq("parent_id", q.id);
+          if (r.error) throw r.error;
+          // আগের উৎস মুছে নতুন উৎস বসায়
+          r = await sb.from("question_sources").delete().eq("question_id", q.id);
+          if (r.error) throw r.error;
+          if ((q.src || []).length) {
+            r = await sb.from("question_sources").insert(q.src.map((s) => ({ question_id: q.id, board_id: s.b, year_id: s.y })));
+            if (r.error) throw r.error;
+          }
+        }
+
+        // সেট ও তার প্রশ্নের তালিকা ডেটাবেসে সেভ করে
+        async function persistSet(s) {
+          let r = await sb.from("sets").upsert({ id: s.id, code: s.code, name: s.name, exam: s.exam || "", exam_date: s.date || "", exam_time: s.time || "", marks: s.marks || "", board_tag: !!s.bt, font_size: s.fs || null, meta: { org: s.org, sub: s.sub, scode: s.scode, note: s.note, cc: s.cc } });
+          if (r.error) throw r.error;
+          // আগের সেট-আইটেম মুছে নতুনগুলো বসায়
+          r = await sb.from("set_items").delete().eq("set_id", s.id);
+          if (r.error) throw r.error;
+          if (s.ids.length) {
+            r = await sb.from("set_items").insert(s.ids.map((id, i) => ({ set_id: s.id, question_id: id, pos: i })));
+            if (r.error) throw r.error;
+          }
+        }
+
+        // ---------- সংযোগ ও লগইন ----------
+        // Supabase সংযোগের তথ্য নেওয়ার ফর্ম
+        function setup() {
+          $("#app").innerHTML = `<div class=wrap><div class=card style="max-width:480px;margin:40px auto"><h3>Supabase সংযোগ</h3><label>Project URL</label><input id=su placeholder="https://xxxx.supabase.co"><label>anon public key</label><input id=sk><p class=mu>service_role কী এখানে কখনো দিও না।</p><button class=pr onclick="saveCfg()">সংরক্ষণ</button></div></div>`;
+        }
+
+        // সংযোগের তথ্য সংরক্ষণ করে পাতা রিলোড করে
+        function saveCfg() {
+          localStorage.setItem("zic_u", $("#su").value.trim());
+          localStorage.setItem("zic_k", $("#sk").value.trim());
+          location.reload();
+        }
+
+        // লগইন ফর্ম দেখায় (ভুল হলে বার্তাসহ)
+        function loginV(msg) {
+          $("#app").innerHTML = `<div class=wrap><div class=card style="max-width:380px;margin:40px auto"><h3>Zenith ICT Care – অ্যাডমিন লগইন</h3><label>ইমেইল</label><input id=le type=email><label>পাসওয়ার্ড</label><input id=lp type=password onkeydown="if(event.key=='Enter')login()"><p style="color:#d92d20">${esc(msg || "")}</p><button class=pr onclick="login()">লগইন</button></div></div>`;
+        }
+
+        // ইমেইল ও পাসওয়ার্ড দিয়ে লগইন করে
+        async function login() {
+          const r = await sb.auth.signInWithPassword({ email: $("#le").value.trim(), password: $("#lp").value });
+          if (r.error) return loginV("লগইন ব্যর্থ: " + r.error.message);
+          after();
+        }
+
+        // লগইনের পর অ্যাডমিন কিনা যাচাই করে ও ডেটা লোড করে
+        async function after() {
+          // ব্যবহারকারী admins টেবিলে আছে কিনা দেখে
+          const r = await sb.from("admins").select("user_id").limit(1);
+          if (r.error || !r.data.length) {
+            const em = r.error ? r.error.message : "admins টেবিলে এই ব্যবহারকারী নেই";
+            await sb.auth.signOut();
+            return loginV("এই অ্যাকাউন্টে অ্যাডমিন অনুমতি নেই (" + em + ")");
+          }
+          // ডেটা লোড হচ্ছে বার্তা দেখায়
+          $("#app").innerHTML = "<div class=wrap><p class=mu>ডেটা লোড হচ্ছে...</p></div>";
+          try {
+            await load();
+          } catch (e) {
+            return $("#app").innerHTML = '<div class=wrap><p style="color:#d92d20">ডেটা লোড ব্যর্থ: ' + esc(e.message) + "</p></div>";
+          }
+          draw();
+        }
+
+        // অ্যাপ চালু করে: সংযোগের তথ্য ও লগইন সেশন দেখে
+        async function boot() {
+          const c = cfg();
+          if (!c.u || !c.k) return setup();
+          sb = supabase.createClient(c.u, c.k);
+          const s = await sb.auth.getSession();
+          if (!s.data.session) return loginV();
+          after();
+        }
+
+        // লগআউট করে পাতা রিলোড করে
+        function logout() {
+          sb.auth.signOut().then(() => location.reload());
+        }
+
+        // অ্যাপ চালু
+        boot();
+    </script>
+</body>
+
+</html>
