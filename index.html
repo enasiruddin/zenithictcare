@@ -798,6 +798,36 @@ const newQ = () => ({
     , kids: [ns()], ...ns()
 }
 );
+// এই সেশনে নতুন যোগ করা প্রশ্নের সংখ্যা (সেভের পরে "নতুন প্রশ্ন" বাটন দেখাতে)
+let SAVED_N = 0;
+// অধ্যায়, টাইপ, বোর্ড-সাল, নোট ও গণিত মোড ঠিক রেখে শুধু প্রশ্নের ঘরগুলো ফাঁকা করে নতুন প্রশ্ন বানায়
+const freshQ = (q) => {
+    const n = newQ();
+    n.ch = q.ch;
+    n.type = q.type;
+    n.src = JSON.parse(JSON.stringify(q.src || []));
+    n.note = q.note || "";
+    n.mx = !!q.mx;
+    n.opts = q.type == "multi" ? [...MD] : ["", "", "", ""];
+    n.stem.pre = q.stem.pre;
+    n.kids = q.kids.map((k) => ns(k.type));
+    return n;
+};
+// সেভের পরে পরের প্রশ্নের প্রথম ঘরে কার্সার নেয়
+const focusFirst = () => setTimeout(() => {
+    const e = document.querySelector('[data-k="text"],[data-k="stem.text"]');
+    if (e) {
+        e.focus();
+        e.scrollIntoView({ block: "center" });
+    }
+}, 0);
+// "নতুন প্রশ্ন" বাটন: একই সেটিংসে ফাঁকা প্রশ্ন খোলে
+function newSame() {
+    if (qtxt().trim() && !confirm("এখন লেখা প্রশ্ন সেভ না হলে হারিয়ে যাবে। নতুন প্রশ্ন খুলবে?")) return;
+    ed = freshQ(ed);
+    draw();
+    focusFirst();
+}
 // "a.b.c" পথ ধরে অবজেক্টের ভেতরে মান বসায়
 const setp = (o, k, v) => {
     const a = String(k).split(".");
@@ -1169,7 +1199,31 @@ const hay = (q) => (q.type == "group" ? [q.stem.text, q.stem.code, ...q.kids.fla
 // "কোনো বোর্ডে নেই" ফিল্টারের বিশেষ মান
 const NOBOARD = "__none";
 const ANYBOARD = "__any";
-const flt = () => S.q.filter((q) => (!F.ch || q.ch == F.ch) && (F.b === NOBOARD ? !(q.src || []).length : F.b === ANYBOARD ? (q.src || []).some((s) => !F.y || s.y == F.y) : !F.b && !F.y || (q.src || []).some((s) => (!F.b || s.b == F.b) && (!F.y || s.y == F.y))) && (!F.t || q.type == F.t) && (!F.s || hay(q).includes(F.s.toLowerCase())));
+const NOYEAR = "__noney";
+const ANYYEAR = "__anyy";
+// বোর্ড ও সাল একটি জোড়া (কম্পোজিট): একটি বাছলে অন্যটিও বাছতে হয়
+// "সব" = কোনো শর্ত নেই, "সব বোর্ড/সব সাল" = যেকোনো একটি, "কোন বোর্ড/সালে নাই" = উৎসহীন প্রশ্ন
+const srcMatch = (q) => {
+    const sr = q.src || [];
+    if (F.b === NOBOARD || F.y === NOYEAR) return !sr.length;
+    if (!F.b && !F.y) return true;
+    return sr.some((s) => (!F.b || F.b === ANYBOARD || s.b == F.b) && (!F.y || F.y === ANYYEAR || s.y == F.y));
+};
+// বোর্ড ড্রপডাউন বদলালে সালের মান মিলিয়ে নেয়
+function onB(v) {
+    F.b = v;
+    if (v === "" || v === NOBOARD) F.y = "";
+    else if (!F.y) F.y = ANYYEAR;
+    draw();
+}
+// সাল ড্রপডাউন বদলালে বোর্ডের মান মিলিয়ে নেয়
+function onY(v) {
+    F.y = v;
+    if (v === "" || v === NOYEAR) F.b = "";
+    else if (!F.b) F.b = ANYBOARD;
+    draw();
+}
+const flt = () => S.q.filter((q) => (!F.ch || q.ch == F.ch) && srcMatch(q) && (!F.t || q.type == F.t) && (!F.s || hay(q).includes(F.s.toLowerCase())));
 // তালিকায় দেখানোর জন্য প্রশ্নের ছোট সারাংশ (৮০ অক্ষর, HTML)
 const smh = (q) => {
     let s = q.type == "group" ? "[উদ্দীপক] " + (q.stem.text || q.stem.code || "(ছবি)") : q.text || "(ছবি)";
@@ -1200,7 +1254,7 @@ const lst = () => {
 }
 ;
 // ফিল্টার বার: সার্চ বক্স, অধ্যায়/টাইপ/বোর্ড/সাল ড্রপডাউন ও চেকবক্স
-const fbar = () => `<div class=fl><input class=s placeholder="🔍 প্রশ্ন সার্চ করো..." value="${esc(F.s)}" oninput="F.s=this.value;$('#lst').innerHTML=lst()"><select onchange="F.ch=this.value;draw()">${chOpts(F.ch, "সব অধ্যায়")}</select><select onchange="F.t=this.value;draw()">${opt([["", "সব টাইপ"], ["single", "Single"], ["multi", "Multiple"], ["group", "উদ্দীপক"]], F.t)}</select>${OP("f") ? `<select onchange="F.b=this.value;draw()">${opt([["", "সব"], [ANYBOARD, "সব বোর্ড"], [NOBOARD, "কোন বোর্ডে নাই"], ...S.boards.map((b) => [b.id, b.name])], F.b || "")}</select><select onchange="F.y=this.value;draw()">${opt([["", "সব সাল"], ...S.years.map((y) => [y.id, y.y])], F.y || "")}</select>` : ""}</div><div class=fl style="margin:2px 0 6px"><label style="margin:0"><input type=checkbox ${OP("f") ? "checked" : ""} onchange="S.opt=S.opt||{};S.opt.f=this.checked;save();draw()"> বোর্ড ফিল্টার</label><label style="margin:0"><input type=checkbox ${OP("l") ? "checked" : ""} onchange="S.opt=S.opt||{};S.opt.l=this.checked;save();draw()"> তালিকায় বোর্ড/সাল</label><button class=sm id=xb onclick="tgx()">${EX ? "সব Collapse করো" : "সব Expand করো"}</button></div>`;
+const fbar = () => `<div class=fl><input class=s placeholder="🔍 প্রশ্ন সার্চ করো..." value="${esc(F.s)}" oninput="F.s=this.value;$('#lst').innerHTML=lst()"><select onchange="F.ch=this.value;draw()">${chOpts(F.ch, "সব অধ্যায়")}</select><select onchange="F.t=this.value;draw()">${opt([["", "সব টাইপ"], ["single", "Single"], ["multi", "Multiple"], ["group", "উদ্দীপক"]], F.t)}</select>${OP("f") ? `<select onchange="onB(this.value)" ${F.y === NOYEAR ? "disabled" : ""}>${opt([["", "ফিল্টার নেই"], [ANYBOARD, "সব বোর্ড"], [NOBOARD, "কোনো বোর্ডে আসেনি"], ...S.boards.map((b) => [b.id, b.name])], F.b || "")}</select><select onchange="onY(this.value)" ${F.b === NOBOARD ? "disabled" : ""}>${opt([["", "ফিল্টার নেই"], [ANYYEAR, "সব সাল"], [NOYEAR, "কোনো সালে নেই"], ...S.years.map((y) => [y.id, y.y])], F.y || "")}</select>` : ""}</div><div class=fl style="margin:2px 0 6px"><label style="margin:0"><input type=checkbox ${OP("f") ? "checked" : ""} onchange="S.opt=S.opt||{};S.opt.f=this.checked;save();draw()"> বোর্ড ফিল্টার</label><label style="margin:0"><input type=checkbox ${OP("l") ? "checked" : ""} onchange="S.opt=S.opt||{};S.opt.l=this.checked;save();draw()"> তালিকায় বোর্ড/সাল</label><button class=sm id=xb onclick="tgx()">${EX ? "সব Collapse করো" : "সব Expand করো"}</button></div>`;
 // ওপরের নেভিগেশন বার
 const nav = () => `<div class="nav no-print"><b>Zenith ICT Care</b>${[["dash", "ড্যাশবোর্ড"], ["ch", "অধ্যায়"], ["src", "বোর্ড ও সাল"], ["bank", "প্রশ্নব্যাংক"], ["set", "সেট তৈরি"], ["sets", "সেভ করা সেট"]].map((x) => `<button class="${view == x[0] ? "on" : ""}" onclick="${x[0] == "set" && !cur ? "newSet()" : "go('" + x[0] + "')"}">${x[1]}</button>`).join("")}<button class=sm style="margin-left:auto" onclick="logout()">লগআউট</button></div>`;
 // ---------- ভিউ (পাতা) ----------
@@ -1243,10 +1297,10 @@ function vE() {
     const g = q.type == "group";
     // এডিটরের শিরোনাম, অধ্যায়/টাইপ/উৎস/নোট, গণিত মোড, LaTeX পরিষ্কার বাটন, চিহ্নের প্যালেট,
     // উদ্দীপকের ঘর ও উপপ্রশ্ন (বা সাধারণ ফর্ম) এবং সেভ/বাতিল বাটন — সবই নিচের HTML-এ
-    return `<h3>${S.q.some((x) => x.id == q.id) ? "প্রশ্ন এডিট" : "নতুন প্রশ্ন"}</h3><div class=ed2><div><div class=card><div class=two><div><label>অধ্যায় (বাধ্যতামূলক)</label><select data-k=ch>${chOpts(q.ch)}</select></div><div><label>টাইপ</label><select data-k=type>${opt([["single", "Single"], ["multi", "Multiple (i, ii, iii)"], ["group", "উদ্দীপক"]], q.type)}</select></div><div style="grid-column:1/-1">${srcF(q)}</div><div><label>নোট / কিওয়ার্ড (সার্চের জন্য)</label><input data-k=note value="${esc(q.note)}"></div></div>
-    <label><input type=checkbox data-k=mx ${q.mx ? "checked" : ""}> গণিত মোড: $...$ লেখা গণিতের আকারে দেখাবে (বন্ধ থাকলে পেস্ট করা LaTeX নিজে সাধারণ লেখা হবে)</label><button class=sm onclick="cleanAll()">🧹 এই প্রশ্নের LaTeX সাধারণ লেখায় বদলাও</button><div class=pal><button class=sm title="~A লিখলে A-এর ওপরে দাগ পড়ে" onmousedown="event.preventDefault();ins('~')">~ ওভারলাইন (১টি অক্ষর)</button><button class=sm title="~{A+B} লিখলে পুরো অংশের ওপরে দাগ পড়ে" onmousedown="event.preventDefault();ins('~{}')">~{ } ওভারলাইন (অংশ)</button>${["₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉", "²", "≤", "≥", "≠", "×", "÷", "⊕", "̅"].map((c) => `<button class=sm onmousedown="event.preventDefault();ins('${c}')">${c == "̅" ? "ওভারলাইন (অক্ষরের পরে)" : c}</button>`).join("")}</div>
+    return `<h3>${S.q.some((x) => x.id == q.id) ? "প্রশ্ন এডিট" : "নতুন প্রশ্ন"}</h3><div class=ed2><div><div class=card><div class=two><div><label>অধ্যায় (বাধ্যতামূলক)</label><select data-k=ch>${chOpts(q.ch)}</select></div><div><label>নোট / কিওয়ার্ড (সার্চের জন্য)</label><input data-k=note value="${esc(q.note)}"></div><div style="grid-column:1/-1">${srcF(q)}</div></div>
+    <label><input type=checkbox data-k=mx ${q.mx ? "checked" : ""}> গণিত মোড: $...$ লেখা গণিতের আকারে দেখাবে (বন্ধ থাকলে পেস্ট করা LaTeX নিজে সাধারণ লেখা হবে)</label><button class=sm onclick="cleanAll()">🧹 এই প্রশ্নের LaTeX সাধারণ লেখায় বদলাও</button><div class=two style="margin-top:8px"><div><label>প্রশ্নের টাইপ</label><select data-k=type>${opt([["single", "Single"], ["multi", "Multiple (i, ii, iii)"], ["group", "উদ্দীপক"]], q.type)}</select></div></div><div class=pal><button class=sm title="~A লিখলে A-এর ওপরে দাগ পড়ে" onmousedown="event.preventDefault();ins('~')">~ ওভারলাইন (১টি অক্ষর)</button><button class=sm title="~{A+B} লিখলে পুরো অংশের ওপরে দাগ পড়ে" onmousedown="event.preventDefault();ins('~{}')">~{ } ওভারলাইন (অংশ)</button>${["₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉", "²", "≤", "≥", "≠", "×", "÷", "⊕", "̅"].map((c) => `<button class=sm onmousedown="event.preventDefault();ins('${c}')">${c == "̅" ? "ওভারলাইন (অক্ষরের পরে)" : c}</button>`).join("")}</div>
     ${g ? `<label>ঘোষণা লাইন</label><select data-k=stem.pre>${opt(PRE.map((x) => [x, x]), q.stem.pre)}</select><label><input type=checkbox data-k=stem.ut ${q.stem.ut !== false ? "checked" : ""}> উদ্দীপক (লেখা) – প্রশ্নে যোগ হবে</label><textarea data-k=stem.text rows=3>${esc(q.stem.text)}</textarea><label><input type=checkbox data-k=stem.uc ${q.stem.uc !== false ? "checked" : ""}> উদ্দীপক (কোড) – প্রশ্নে যোগ হবে</label><textarea data-k=stem.code rows=3 style="font-family:monospace">${esc(q.stem.code)}</textarea><label><input type=checkbox data-k=stem.ui ${q.stem.ui !== false ? "checked" : ""}> উদ্দীপক (ছবি) – প্রশ্নে যোগ হবে</label>${imgF("stem.img", q.stem.img)}` + q.kids.map((o, i) => `<div class=card><div class=fl><b>প্রশ্ন ${bn(i + 1)}</b><select data-k="kids.${i}.type">${opt([["single", "Single"], ["multi", "Multiple"]], o.type)}</select>${q.kids.length > 1 ? `<button class=sm onclick="ed.kids.splice(${i},1);draw()">সরাও</button>` : ""}</div>${sf(o, "kids." + i + ".")}</div>`).join("") + (q.kids.length < 2 ? `<button onclick="ed.kids.push(ns());draw()">+ দ্বিতীয় প্রশ্ন</button>` : "") : sf(q, "")}
-    <div class=fl style="margin-top:12px"><button class=pr onclick="saveQ()">সেভ করো</button><button onclick="ed=null;draw()">বাতিল</button></div></div></div><div id=sim class=card></div></div>`;
+    <div class=fl style="margin-top:12px"><button class=pr onclick="saveQ()">সেভ করো</button>${SAVED_N ? `<button onclick="newSame()">নতুন প্রশ্ন</button>` : ""}<button onclick="SAVED_N=0;ed=null;draw()">${SAVED_N ? "বন্ধ করো" : "বাতিল"}</button>${SAVED_N ? `<small class=mu>✓ ${bn(SAVED_N)} টি প্রশ্ন সেভ হয়েছে (সেটিংস ও টাইপ একই আছে)</small>` : ""}</div></div></div><div id=sim class=card></div></div>`;
 }
 
 // সেটে নির্বাচিত প্রশ্নের তালিকা (↑ ↓ ✕ বাটনসহ)
@@ -1341,6 +1395,7 @@ function newQuestion() {
         return go("ch");
     }
 
+    SAVED_N = 0;
     ed = newQ();
     view = "bank";
     draw();
@@ -1348,6 +1403,7 @@ function newQuestion() {
 
 // বিদ্যমান প্রশ্নের কপি এডিটরে খোলে
 function editQ(id) {
+    SAVED_N = 0;
     ed = JSON.parse(JSON.stringify(S.q.find((q) => q.id == id)));
     draw();
 }
@@ -1392,9 +1448,18 @@ async function saveQ() {
 
     // তালিকায় থাকলে বদলায়, নাহলে নতুন যোগ করে
     const i = S.q.findIndex((x) => x.id == q.id);
+    const wasNew = i < 0;
     i < 0 ? S.q.push(q) : S.q[i] = q;
-    ed = null;
-    draw();
+    if (wasNew) {
+        // নতুন প্রশ্ন: সেটিংস ও টাইপ ঠিক রেখে ফর্ম ফাঁকা করে, পরের প্রশ্নের জন্য তৈরি রাখে
+        SAVED_N++;
+        ed = freshQ(q);
+        draw();
+        focusFirst();
+    } else {
+        ed = null;
+        draw();
+    }
 }
 
 // সব প্রশ্ন Expand/Collapse টগল করে
@@ -2146,8 +2211,8 @@ async function delY(id) {
 
 // ---------- Supabase (ডেটাবেস) ----------
 // Supabase-এর URL ও কী (ফাঁকা থাকলে লগইনের আগে ইনপুট নেয়)
-const SB_URL = "https://oallnaqwyzmxgohgbarc.supabase.co";
-const SB_KEY = "sb_publishable_aY-4PjzcNxLZm5KEtVr39w__KrV09Mk";
+const SB_URL = "";
+const SB_KEY = "";
 // sb = Supabase ক্লায়েন্ট
 let sb = null;
 // সংযোগের তথ্য নেয় (কোডের মান, নাহলে localStorage থেকে)
