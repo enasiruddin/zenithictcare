@@ -1419,7 +1419,29 @@ async function delQ(id) {
 }
 
 // প্রশ্ন যাচাই করে ডেটাবেসে সেভ করে
+// সেভ চলাকালীন আবার "সেভ" চাপলে দ্বিতীয় অনুরোধ আটকায় (ডুপ্লিকেট কী ত্রুটি এড়াতে)
+let SAVING = false;
 async function saveQ() {
+    if (SAVING) return;
+    SAVING = true;
+    const btn = document.querySelector('button.pr[onclick="saveQ()"]');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = "সেভ হচ্ছে...";
+    }
+    try {
+        await saveQInner();
+    } finally {
+        SAVING = false;
+        const b2 = document.querySelector('button.pr[onclick="saveQ()"]');
+        if (b2) {
+            b2.disabled = false;
+            b2.textContent = "সেভ করো";
+        }
+    }
+}
+
+async function saveQInner() {
     const q = ed;
     const subs = q.type == "group" ? q.kids : [q];
     // অধ্যায় বাছাই হয়েছে কিনা দেখে
@@ -2352,10 +2374,10 @@ async function persistQ(q) {
     r = await sb.from("question_sources").delete().eq("question_id", q.id);
     if (r.error) throw r.error;
     if ((q.src || []).length) {
-        r = await sb.from("question_sources").insert(q.src.map((s) => ({
+        // একই জোড়া আগে থাকলে (দ্রুত দুবার সেভ হলেও) ত্রুটি না দিয়ে বাদ দেয়
+        r = await sb.from("question_sources").upsert(q.src.map((s) => ({
             question_id: q.id, board_id: s.b, year_id: s.y
-        }
-        )));
+        })), { onConflict: "question_id,board_id,year_id", ignoreDuplicates: true });
         if (r.error) throw r.error;
     }
 }
@@ -2373,10 +2395,9 @@ async function persistSet(s) {
     r = await sb.from("set_items").delete().eq("set_id", s.id);
     if (r.error) throw r.error;
     if (s.ids.length) {
-        r = await sb.from("set_items").insert(s.ids.map((id, i) => ({
+        r = await sb.from("set_items").upsert(s.ids.map((id, i) => ({
             set_id: s.id, question_id: id, pos: i
-        }
-        )));
+        })), { onConflict: "set_id,question_id", ignoreDuplicates: true });
         if (r.error) throw r.error;
     }
 }
